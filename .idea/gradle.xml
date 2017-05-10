@@ -9,7 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/ca.frozen.library" />
+            <option value="$PROJECT_DIR$/native-camera-library" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
