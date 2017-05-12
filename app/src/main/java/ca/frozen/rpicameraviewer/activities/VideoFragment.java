@@ -45,7 +45,7 @@ import ca.frozen.rpicameraviewer.classes.Source;
 import ca.frozen.rpicameraviewer.classes.SpsParser;
 import ca.frozen.rpicameraviewer.classes.TcpIpReader;
 import ca.frozen.rpicameraviewer.classes.Utils;
-import ca.frozen.library.views.ZoomPanTextureView;
+import ca.frozen.rpicameraviewer.views.ZoomPanTextureView;
 
 public class VideoFragment extends Fragment implements TextureView.SurfaceTextureListener
 {

@@ -32,10 +32,20 @@ import ca.frozen.rpicameraviewer.classes.CameraAdapter;
 import ca.frozen.rpicameraviewer.classes.Utils;
 import ca.frozen.rpicameraviewer.R;
 
+import org.opencv.android.OpenCVLoader;
+
 public class MainActivity extends AppCompatActivity
 {
 	// local constants
 	private final static String TAG = "MainActivity";
+
+	static {
+		if(!OpenCVLoader.initDebug()){
+			Log.d(TAG, "OpenCV not loaded");
+		} else {
+			Log.d(TAG, "OpenCV loaded");
+		}
+	}
 
 	// instance variables
 	private CameraAdapter adapter;
