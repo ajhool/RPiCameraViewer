@@ -1,1 +1,2 @@
 include ':app', ':native-camera-library'
+include ':openCVLibrary320'
