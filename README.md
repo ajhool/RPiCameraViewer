@@ -15,7 +15,7 @@ camera image by [Oxygen Team](http://www.oxygen-icons.org).
 
 [Streaming Raw H.264 From A Raspberry Pi](http://frozen.ca/streaming-raw-h-264-from-a-raspberry-pi)
 
-#Importing the aar dependencies in Android Studio
+## Importing the aar dependencies in Android Studio
 In order to import a .aar library:
 
 1. Go to File>New>New Module
@@ -27,3 +27,7 @@ In order to import a .aar library:
 7. Click the green "+" in the upper right corner.
 8. Select "Module Dependency"
 9. Select the new module from the list.
+
+## Importing opencv Dependency in Android Studio
+> File > Project Structure > Choose "app" in Modules on left panel > Dependencies > + > openCV...
+
