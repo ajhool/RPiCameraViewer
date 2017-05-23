@@ -24,5 +24,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
+    compile 'org.tensorflow:tensorflow-android:1.2.0-preview'
     compile project(':openCVLibrary320')
 }
