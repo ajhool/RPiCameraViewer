@@ -1,3 +1,12 @@
+
+project.buildDir = 'gradleBuild'
+getProject().setBuildDir('gradleBuild')
+
+project.ext.ASSET_DIR = projectDir.toString() + '/assets'
+
+assert file(project.ext.ASSET_DIR + "/rounded_graph.pb").exists()
+assert file(project.ext.ASSET_DIR + "/retrained_labels.txt").exists()
+
 apply plugin: 'com.android.application'
 
 android {
@@ -5,12 +14,19 @@ android {
     buildToolsVersion "25.0.3"
 
     defaultConfig {
-        applicationId "ca.frozen.rpicameraviewer"
+        applicationId "com.mobilecv.rpi"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 5
         versionName "1.4"
     }
+
+    sourceSets {
+        main {
+            assets.srcDirs = [project.ext.ASSET_DIR]
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false

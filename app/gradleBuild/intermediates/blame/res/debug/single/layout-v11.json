@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/layout-v11/notification_template_big_media.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/layout-v11/notification_template_big_media.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/layout-v11/notification_template_big_media_narrow.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/layout-v11/notification_template_big_media_narrow.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/layout-v11/notification_template_big_media_custom.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/layout-v11/notification_template_big_media_custom.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/layout-v11/notification_media_action.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/layout-v11/notification_media_action.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/layout-v11/notification_template_big_media_narrow_custom.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/layout-v11/notification_template_big_media_narrow_custom.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/layout-v11/notification_media_cancel_action.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/layout-v11/notification_media_cancel_action.xml"
+    }
+]

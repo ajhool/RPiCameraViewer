@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/drawable-xxhdpi/white_plus.png",
+        "source": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/src/main/res/drawable-xxhdpi/white_plus.png"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/drawable-xxhdpi/snapshot_button.png",
+        "source": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/src/main/res/drawable-xxhdpi/snapshot_button.png"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/drawable-xxhdpi/camera.png",
+        "source": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/src/main/res/drawable-xxhdpi/camera.png"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/drawable-xxhdpi/white_x.png",
+        "source": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/src/main/res/drawable-xxhdpi/white_x.png"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/drawable-xxhdpi/logo.png",
+        "source": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/src/main/res/drawable-xxhdpi/logo.png"
+    }
+]

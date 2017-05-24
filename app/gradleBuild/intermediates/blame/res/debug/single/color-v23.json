@@ -1,0 +1,46 @@
+[
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_tint_switch_thumb.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_tint_switch_thumb.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_btn_colored_text_material.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_btn_colored_text_material.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_tint_btn_checkable.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_tint_btn_checkable.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_btn_colored_borderless_text_material.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_btn_colored_borderless_text_material.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_color_highlight_material.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_color_highlight_material.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_tint_seek_thumb.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_tint_seek_thumb.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_tint_switch_track.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_tint_switch_track.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_tint_edittext.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_tint_edittext.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/design_tint_password_toggle.xml",
+        "source": "/Users/Aidan/.android/build-cache/2bf9231448345fef84fa91c6d745bc1c03bf6135/output/res/color-v23/design_tint_password_toggle.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_tint_spinner.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_tint_spinner.xml"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/res/merged/debug/color-v23/abc_tint_default.xml",
+        "source": "/Users/Aidan/.android/build-cache/3dd15cb996c6e056a2490143131e97d3b089bb58/output/res/color-v23/abc_tint_default.xml"
+    }
+]
