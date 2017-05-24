@@ -1,4 +1,0 @@
-#Tue May 23 22:21:03 EDT 2017
-base.0=/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/transforms/dex/debug/folders/1000/5/slice_7
-renamed.0=classes.dex
-file.0=/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/app/gradleBuild/intermediates/transforms/dex/debug/folders/1000/5/slice_7/classes.dex

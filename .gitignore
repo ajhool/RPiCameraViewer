@@ -13,6 +13,8 @@
 bin/
 gen/
 out/
+app/gradleBuild/
+
 
 # Gradle files
 .gradle
