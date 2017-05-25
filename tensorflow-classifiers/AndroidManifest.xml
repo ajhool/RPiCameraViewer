@@ -21,4 +21,24 @@
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="25" />
+
+    <application
+        android:allowBackup="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="org.tensorflow.demo.ClassifierActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/activity_name_classification">
+        </activity>
+
+        <activity android:name="org.tensorflow.demo.DetectorActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/activity_name_detection">
+        </activity>
+
+        <activity android:name="org.tensorflow.demo.StylizeActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/activity_name_stylize">
+        </activity>
+    </application>
+
 </manifest>
