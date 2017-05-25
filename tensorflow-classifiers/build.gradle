@@ -54,7 +54,7 @@ def nativeOutDir = 'libs/' + cpuType
 
 // Default to building with Bazel and override with make if requested.
 def nativeBuildRule = 'buildNativeBazel'
-def demoLibPath = '../../../bazel-bin/tensorflow/examples/android/libtensorflow_demo.so'
+def demoLibPath = '../../../bazel-bin/tensorflow-classifiers/libtensorflow_demo.so'
 def inferenceLibPath = '../../../bazel-bin/tensorflow/contrib/android/libtensorflow_inference.so'
 if (nativeBuildSystem == 'makefile') {
     nativeBuildRule = 'buildNativeMake'

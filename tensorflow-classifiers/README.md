@@ -19,15 +19,15 @@ on API >= 14 devices.
 
 ## Current samples:
 
-1. [TF Classify](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/src/org/tensorflow/demo/ClassifierActivity.java):
+1. [TF Classify](https://github.com/tensorflow/tensorflow/blob/master/tensorflow-classifiers/src/org/tensorflow/demo/ClassifierActivity.java):
         Uses the [Google Inception](https://arxiv.org/abs/1409.4842)
         model to classify camera frames in real-time, displaying the top results
         in an overlay on the camera image.
-2. [TF Detect](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/src/org/tensorflow/demo/DetectorActivity.java):
+2. [TF Detect](https://github.com/tensorflow/tensorflow/blob/master/tensorflow-classifiers/src/org/tensorflow/demo/DetectorActivity.java):
         Demonstrates a model based on [Scalable Object Detection
         using Deep Neural Networks](https://arxiv.org/abs/1312.2249) to
         localize and track people in the camera preview in real-time.
-3. [TF Stylize](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/src/org/tensorflow/demo/StylizeActivity.java):
+3. [TF Stylize](https://github.com/tensorflow/tensorflow/blob/master/tensorflow-classifiers/src/org/tensorflow/demo/StylizeActivity.java):
         Uses a model based on [A Learned Representation For Artistic
         Style](https://arxiv.org/abs/1610.07629) to restyle the camera preview 
         image to that of a number of different artists.
@@ -152,7 +152,7 @@ BASE_URL=https://storage.googleapis.com/download.tensorflow.org/models
 for MODEL_ZIP in inception5h.zip mobile_multibox_v1a.zip stylize_v1.zip
 do
   curl -L ${BASE_URL}/${MODEL_ZIP} -o /tmp/${MODEL_ZIP}
-  unzip /tmp/${MODEL_ZIP} -d tensorflow/examples/android/assets/
+  unzip /tmp/${MODEL_ZIP} -d tensorflow-classifiers/assets/
 done
 ```
 
@@ -183,7 +183,7 @@ later device, then after building use the following command from your workspace
 root to install the APK:
 
 ```bash
-adb install -r bazel-bin/tensorflow/examples/android/tensorflow_demo.apk
+adb install -r bazel-bin/tensorflow-classifiers/tensorflow_demo.apk
 ```
 
 ### Android Studio with Bazel

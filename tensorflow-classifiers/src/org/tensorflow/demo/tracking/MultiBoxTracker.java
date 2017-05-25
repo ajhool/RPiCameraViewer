@@ -211,7 +211,7 @@ public class MultiBoxTracker {
       if (objectTracker == null) {
         String message =
             "Object tracking support not found. "
-                + "See tensorflow/examples/android/README.md for details.";
+                + "See tensorflow-classifiers/README.md for details.";
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
         logger.e(message);
       }

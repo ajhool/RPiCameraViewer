@@ -68,7 +68,7 @@ android_binary(
     # Package assets from assets dir as well as all model targets. Remove undesired models
     # (and corresponding Activities in source) to reduce APK size.
     assets = [
-        "//tensorflow/examples/android/assets:asset_files",
+        "//tensorflow-classifiers/assets:asset_files",
         ":external_assets",
     ],
     assets_dir = "",
@@ -96,7 +96,7 @@ filegroup(
         "@stylize//:model_files",
     ],
 )
-# LINT.ThenChange(//tensorflow/examples/android/download-models.gradle)
+# LINT.ThenChange(//tensorflow-classifiers/download-models.gradle)
 
 filegroup(
     name = "all_files",
