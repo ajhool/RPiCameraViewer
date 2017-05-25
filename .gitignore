@@ -14,7 +14,7 @@ bin/
 gen/
 out/
 app/gradleBuild/
-
+tensorflow-classifiers/gradleBuild/
 
 # Gradle files
 .gradle
