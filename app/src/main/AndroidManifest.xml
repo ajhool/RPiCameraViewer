@@ -8,6 +8,11 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
 
     <application
         android:name=".App"
@@ -61,6 +66,34 @@
             android:screenOrientation="sensorLandscape"
             android:parentActivityName=".activities.MainActivity" >
         </activity>
+
+        <activity android:name="org.tensorflow.demo.ClassifierActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/activity_name_classification">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.tensorflow.demo.DetectorActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/activity_name_detection">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="org.tensorflow.demo.StylizeActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/activity_name_stylize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
