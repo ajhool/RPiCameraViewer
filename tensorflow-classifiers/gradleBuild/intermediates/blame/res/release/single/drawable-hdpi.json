@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/tensorflow-classifiers/gradleBuild/intermediates/res/merged/release/drawable-hdpi/ic_launcher.png",
+        "source": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/tensorflow-classifiers/res/drawable-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/tensorflow-classifiers/gradleBuild/intermediates/res/merged/release/drawable-hdpi/ic_action_info.png",
+        "source": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/tensorflow-classifiers/res/drawable-hdpi/ic_action_info.png"
+    },
+    {
+        "merged": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/tensorflow-classifiers/gradleBuild/intermediates/res/merged/release/drawable-hdpi/tile.9.png",
+        "source": "/Users/Aidan/Development/TelescopicEarWearable/RPICameraTensor/tensorflow-classifiers/res/drawable-hdpi/tile.9.png"
+    }
+]
