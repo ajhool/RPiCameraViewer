@@ -465,7 +465,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     View view = inflater.inflate(layout, container, false);
 
     // set the texture listener
-    zoomTextureView = (ZoomPanTextureView)view.findViewById(org.tensorflow.demo.R.id.video_surface);
+    zoomTextureView = (ZoomPanTextureView)view.findViewById(R.id.video_surface);
     zoomTextureView.setSurfaceTextureListener(this);
     zoomTextureView.setZoomRange(MIN_ZOOM, MAX_ZOOM);
     zoomTextureView.setOnTouchListener(new View.OnTouchListener()
@@ -502,7 +502,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
   @Override
   public void onViewCreated(final View view, final Bundle savedInstanceState) {
-    textureView = (AutoFitTextureView) view.findViewById(org.tensorflow.demo.R.id.texture);
+    //textureView = (AutoFitTextureView) view.findViewById(org.tensorflow.demo.R.id.texture);
   }
 
   @Override
@@ -566,10 +566,10 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
     // a camera and start preview from here (otherwise, we wait until the surface is ready in
     // the SurfaceTextureListener).
-    if (textureView.isAvailable()) {
-      openCamera(textureView.getWidth(), textureView.getHeight());
+    if (zoomTextureView.isAvailable()) {
+      openCamera(zoomTextureView.getWidth(), zoomTextureView.getHeight());
     } else {
-      textureView.setSurfaceTextureListener(surfaceTextureListener);
+      zoomTextureView.setSurfaceTextureListener(surfaceTextureListener);
     }
   }
 
@@ -688,9 +688,9 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
         // We fit the aspect ratio of TextureView to the size of preview we picked.
         final int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-          textureView.setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
+          zoomTextureView.setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
         } else {
-          textureView.setAspectRatio(previewSize.getHeight(), previewSize.getWidth());
+          zoomTextureView.setAspectRatio(previewSize.getHeight(), previewSize.getWidth());
         }
 
         PiCamConnectionFragment.this.cameraId = cameraId;
