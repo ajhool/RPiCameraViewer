@@ -34,7 +34,7 @@ import java.nio.ByteBuffer;
 import org.tensorflow.demo.env.Logger;
 import org.tensorflow.demo.R;
 
-public abstract class CameraActivity extends Activity implements OnImageAvailableListener {
+public abstract class CameraActivity extends Activity implements OnImageAvailableListener, CameraConnectionFragment.ConnectionCallback {
   private static final Logger LOGGER = new Logger();
 
   private static final int PERMISSIONS_REQUEST = 1;
@@ -153,12 +153,7 @@ public abstract class CameraActivity extends Activity implements OnImageAvailabl
   protected void setFragment() {
     final Fragment fragment =
         CameraConnectionFragment.newInstance(
-            new CameraConnectionFragment.ConnectionCallback() {
-              @Override
-              public void onPreviewSizeChosen(final Size size, final int rotation) {
-                CameraActivity.this.onPreviewSizeChosen(size, rotation);
-              }
-            },
+                this,
             this,
             getLayoutId(),
             getDesiredPreviewFrameSize());
@@ -213,7 +208,8 @@ public abstract class CameraActivity extends Activity implements OnImageAvailabl
     return super.onKeyDown(keyCode, event);
   }
 
-  protected abstract void onPreviewSizeChosen(final Size size, final int rotation);
+  @Override
+  public abstract void onPreviewSizeChosen(final Size size, final int rotation);
   protected abstract int getLayoutId();
   protected abstract Size getDesiredPreviewFrameSize();
 }
