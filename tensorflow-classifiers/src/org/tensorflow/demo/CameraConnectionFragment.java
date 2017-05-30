@@ -489,6 +489,10 @@ public class CameraConnectionFragment extends Fragment {
     }
   }
 
+  /*
+   * TODO: All of the CameraCaptureSession callbacks are stunted.. why?
+   */
+
   private final CameraCaptureSession.CaptureCallback captureCallback =
       new CameraCaptureSession.CaptureCallback() {
         @Override

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.demo;
+package ca.frozen.rpicameraviewer.mlcameras;
 
 import android.Manifest;
 import android.app.Activity;
@@ -30,11 +30,15 @@ import android.util.Size;
 import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.widget.Toast;
-import java.nio.ByteBuffer;
-import org.tensorflow.demo.env.Logger;
-import org.tensorflow.demo.R;
 
-public abstract class CameraActivity extends Activity implements OnImageAvailableListener, CameraConnectionFragment.ConnectionCallback {
+import org.tensorflow.demo.CameraConnectionFragment;
+import org.tensorflow.demo.OverlayView;
+import org.tensorflow.demo.R;
+import org.tensorflow.demo.env.Logger;
+
+import java.nio.ByteBuffer;
+
+public abstract class MLCameraActivity extends Activity implements OnImageAvailableListener, CameraConnectionFragment.ConnectionCallback {
   private static final Logger LOGGER = new Logger();
 
   private static final int PERMISSIONS_REQUEST = 1;
@@ -144,7 +148,7 @@ public abstract class CameraActivity extends Activity implements OnImageAvailabl
   private void requestPermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (shouldShowRequestPermissionRationale(PERMISSION_CAMERA) || shouldShowRequestPermissionRationale(PERMISSION_STORAGE)) {
-        Toast.makeText(CameraActivity.this, "Camera AND storage permission are required for this demo", Toast.LENGTH_LONG).show();
+        Toast.makeText(MLCameraActivity.this, "Camera AND storage permission are required for this demo", Toast.LENGTH_LONG).show();
       }
       requestPermissions(new String[] {PERMISSION_CAMERA, PERMISSION_STORAGE}, PERMISSIONS_REQUEST);
     }
