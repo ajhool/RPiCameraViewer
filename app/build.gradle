@@ -1,4 +1,3 @@
-
 project.buildDir = 'gradleBuild'
 getProject().setBuildDir('gradleBuild')
 
@@ -41,10 +40,12 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
+    compile project(':openCVLibrary320')
+    compile project(':tensorflow-classifiers')
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'org.tensorflow:tensorflow-android:1.2.0-preview'
-    compile project(':openCVLibrary320')
-    compile project(':tensorflow-classifiers')
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.google.android.gms:play-services-plus:10.2.6'
+    testCompile 'junit:junit:4.12'
 }

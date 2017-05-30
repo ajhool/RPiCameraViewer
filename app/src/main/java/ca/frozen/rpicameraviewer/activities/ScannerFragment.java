@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -308,7 +307,7 @@ public class ScannerFragment extends DialogFragment
 		@Override
 		protected void onPostExecute(Void unused)
 		{
-			final MainActivity activity = getActivity(cancelButton);
+			final SelectCameraActivity activity = getActivity(cancelButton);
 			if (activity != null)
 			{
 				activity.runOnUiThread(new Runnable()
@@ -435,7 +434,7 @@ public class ScannerFragment extends DialogFragment
 		//******************************************************************************
 		private synchronized void setStatus(final boolean last)
 		{
-			MainActivity activity = getActivity(status);
+			SelectCameraActivity activity = getActivity(status);
 			if (activity != null)
 			{
 				activity.runOnUiThread(new Runnable()
@@ -462,15 +461,15 @@ public class ScannerFragment extends DialogFragment
 		//******************************************************************************
 		// getActivity
 		//******************************************************************************
-		private MainActivity getActivity(View view)
+		private SelectCameraActivity getActivity(View view)
 		{
-			MainActivity activity = null;
+			SelectCameraActivity activity = null;
 			if (view != null)
 			{
 				ScannerFragment fragment = (fragmentWeakRef != null) ? fragmentWeakRef.get() : null;
 				if (fragment != null)
 				{
-					activity = (MainActivity)fragment.getActivity();
+					activity = (SelectCameraActivity)fragment.getActivity();
 				}
 			}
 			return activity;

@@ -151,7 +151,8 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
    */
   public final static String CAMERA = "camera";
   public final static String FULL_SCREEN = "full_screen";
-
+    public final static String LAYOUT = "layout";
+    public final static String INPUT_SIZE = "input_size";
 
   private final static int FINISH_TIMEOUT = 5000;
 
@@ -305,17 +306,17 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   /**
    * A {@link OnImageAvailableListener} to receive frames as they are available.
    */
-  private final OnImageAvailableListener imageListener;
+  private OnImageAvailableListener imageListener;
 
   /** The input size in pixels desired by TensorFlow (width and height of a square bitmap). */
-  private final Size inputSize;
+  private Size inputSize;
 
   /**
    * The layout identifier to inflate for this Fragment.
    */
-  private final int layout;
+  private int layout;
 
-  private final ConnectionCallback cameraConnectionCallback;
+  private ConnectionCallback cameraConnectionCallback;
 
   /*
    * From RPi VideoFragment
@@ -329,15 +330,8 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   private Runnable fadeInRunner, fadeOutRunner, finishRunner, startVideoRunner;
   private Handler fadeInHandler, fadeOutHandler, finishHandler, startVideoHandler;
 
-  private PiCamConnectionFragment(
-      final ConnectionCallback connectionCallback,
-      final OnImageAvailableListener imageListener,
-      final int layout,
-      final Size inputSize) {
-    this.cameraConnectionCallback = connectionCallback;
-    this.imageListener = imageListener;
-    this.layout = layout;
-    this.inputSize = inputSize;
+  public PiCamConnectionFragment() {
+      //Required default constructor.
   }
 
     /*
@@ -347,7 +341,6 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   //TODO: See inner TODO.
   public static PiCamConnectionFragment newInstance(
           final ConnectionCallback callback,
-          final OnImageAvailableListener imageListener,
           final int layout,
           final Size inputSize,
           final Camera camera,
@@ -355,15 +348,17 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
     //TODO: Need to blend VideoFragment into PiCamConnectionFragment
 
-    PiCamConnectionFragment piCamConnectionFragment = new PiCamConnectionFragment(callback, imageListener, layout, inputSize);
-    VideoFragment fragment = new VideoFragment();
+      PiCamConnectionFragment piCamConnectionFragment = new PiCamConnectionFragment();
 
-    Bundle args = new Bundle();
-    args.putParcelable(CAMERA, camera);
-    args.putBoolean(FULL_SCREEN, fullScreen);
-    fragment.setArguments(args);
+      Bundle args = new Bundle();
+      args.putParcelable(CAMERA, camera);
+      args.putBoolean(FULL_SCREEN, fullScreen);
+      args.putInt(LAYOUT, layout);
+      args.putSize(INPUT_SIZE, inputSize);
 
-    return piCamConnectionFragment;
+      piCamConnectionFragment.setArguments(args);
+
+      return piCamConnectionFragment;
   }
 
   /**
@@ -431,8 +426,11 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     // get the parameters
     camera = getArguments().getParcelable(CAMERA);
     fullScreen = getArguments().getBoolean(FULL_SCREEN);
+    layout = getArguments().getInt(LAYOUT);
+      inputSize = getArguments().getSize(INPUT_SIZE);
 
-    // create the finish handler and runnable
+
+      // create the finish handler and runnable
     finishHandler = new Handler();
     finishRunner = new Runnable()
     {
@@ -555,8 +553,6 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   {
   }
 
-
-
   public void noConnection(){
     finishHandler.postDelayed(finishRunner, FINISH_TIMEOUT);
   }
@@ -582,6 +578,32 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     closeCamera();
     stopBackgroundThread();
     super.onPause();
+  }
+
+  @Override
+  public void onAttach(Context context){
+      super.onAttach(context);
+      if(context instanceof OnImageAvailableListener) {
+          this.imageListener = (OnImageAvailableListener) context;
+      } else {
+          throw new RuntimeException(context.toString()
+                  + " must implement OnImageAvailableListener");
+      }
+
+      if (context instanceof ConnectionCallback) {
+          this.cameraConnectionCallback = (ConnectionCallback) context;
+      } else {
+          throw new RuntimeException(context.toString()
+                  + " must implement ConnectionCallback");
+      }
+  }
+
+  @Override
+  public void onDetach(){
+      super.onDetach();
+
+      cameraConnectionCallback = null;
+      imageListener = null;
   }
 
   @Override

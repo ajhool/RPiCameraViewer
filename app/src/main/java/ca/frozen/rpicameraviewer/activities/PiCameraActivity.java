@@ -15,13 +15,13 @@ import ca.frozen.rpicameraviewer.classes.Camera;
 import ca.frozen.rpicameraviewer.classes.Utils;
 import ca.frozen.rpicameraviewer.R;
 
-public class CameraActivity extends AppCompatActivity
+public class PiCameraActivity extends AppCompatActivity
 {
 	// public constants
 	public final static String CAMERA = "camera";
 
 	// local constants
-	private final static String TAG = "CameraActivity";
+	private final static String TAG = "PiCameraActivity";
 
 	// instance variables
 	private Camera camera;
