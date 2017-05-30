@@ -61,7 +61,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.tensorflow.demo.AutoFitTextureView;
+//import org.tensorflow.demo.AutoFitTextureView;
 import org.tensorflow.demo.env.Logger;
 
 import java.nio.ByteBuffer;
@@ -216,9 +216,9 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   private String cameraId;
 
   /**
-   * An {@link AutoFitTextureView} for camera preview.
+   //* An {@link AutoFitTextureView} for camera preview.
    */
-  private AutoFitTextureView textureView;
+  //private AutoFitTextureView textureView;
 
   /**
    * A {@link CameraCaptureSession } for camera preview.
@@ -800,7 +800,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
    */
   private void createCameraPreviewSession() {
     try {
-      final SurfaceTexture texture = textureView.getSurfaceTexture();
+      final SurfaceTexture texture = zoomTextureView.getSurfaceTexture();
       assert texture != null;
 
       // We configure the size of default buffer to be the size of camera preview we want.
@@ -876,7 +876,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
    */
   private void configureTransform(final int viewWidth, final int viewHeight) {
     final Activity activity = getActivity();
-    if (null == textureView || null == previewSize || null == activity) {
+    if (null == zoomTextureView || null == previewSize || null == activity) {
       return;
     }
     final int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
@@ -897,7 +897,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     } else if (Surface.ROTATION_180 == rotation) {
       matrix.postRotate(180, centerX, centerY);
     }
-    textureView.setTransform(matrix);
+    zoomTextureView.setTransform(matrix);
   }
 
   /**
