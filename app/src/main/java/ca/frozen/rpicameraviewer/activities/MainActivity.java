@@ -33,6 +33,8 @@ import ca.frozen.rpicameraviewer.classes.Utils;
 import ca.frozen.rpicameraviewer.R;
 
 import org.opencv.android.OpenCVLoader;
+import org.tensorflow.demo.DetectorActivity;
+import org.tensorflow.demo.StylizeActivity;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -100,8 +102,9 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				Camera camera = new Camera(Utils.getNextCameraName(adapter.getCameras()), Utils.getSettings().rawTcpIpSource);
-				startCameraActivity(camera);
+				//Camera camera = new Camera(Utils.getNextCameraName(adapter.getCameras()), Utils.getSettings().rawTcpIpSource);
+				//startCameraActivity(camera);
+                startDetectorActivity();
 			}
 		});
 
@@ -394,6 +397,15 @@ public class MainActivity extends AppCompatActivity
 		intent.putExtra(CameraActivity.CAMERA, camera);
 		startActivity(intent);
 	}
+
+    //******************************************************************************
+    // startDetectorActivity
+    //******************************************************************************
+    private void startDetectorActivity()
+    {
+        Intent intent = new Intent(App.getContext(), DetectorActivity.class);
+        startActivity(intent);
+    }
 
 	//******************************************************************************
 	// startVideoActivity

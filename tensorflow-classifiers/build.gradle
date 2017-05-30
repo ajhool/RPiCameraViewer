@@ -79,7 +79,7 @@ android {
 
     if (nativeBuildSystem == 'cmake') {
         defaultConfig {
-            minSdkVersion 18
+            minSdkVersion 19
             targetSdkVersion 25
             ndk {
                 abiFilters "${cpuType}"
