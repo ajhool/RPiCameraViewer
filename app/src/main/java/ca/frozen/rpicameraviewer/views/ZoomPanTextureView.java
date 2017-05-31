@@ -22,7 +22,6 @@ public class ZoomPanTextureView extends TextureView
     private float minZoom = 0.1f;
     private float maxZoom = 10;
 
-
     private int ratioWidth = 0;
     private int ratioHeight = 0;
 

@@ -21,8 +21,7 @@ import ca.frozen.rpicameraviewer.classes.TcpIpReader;
 
 /*
  * DecoderThread
- * Responsible for reading in a Video over IP datastream (specifically h.264 encoded video the raspberry pi)
- * Must call
+ * Responsible for reading in a Video over IP data (specifically h.264 encoded video from the raspberry pi)
  */
 public class DecoderThread extends Thread {
   private final static String TAG = "DecoderThread";
