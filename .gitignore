@@ -6,6 +6,9 @@
 # Files for the ART/Dalvik VM
 *.dex
 
+# Android memory monitoring dump
+*.hprof
+
 # Java class files
 *.class
 
