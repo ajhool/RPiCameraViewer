@@ -326,7 +326,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   private DecoderThread decoder;
   private ZoomPanTextureView zoomTextureView;
   private TextView nameView, messageView;
-  private Button snapshotButton;
+  //private Button snapshotButton;
   private Runnable fadeInRunner, fadeOutRunner, finishRunner, startVideoRunner;
   private Handler fadeInHandler, fadeOutHandler, finishHandler, startVideoHandler;
 
@@ -468,7 +468,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
        */
 
     // set the texture listener
-    zoomTextureView = (ZoomPanTextureView) view.findViewById(R.id.video_surface);
+    zoomTextureView = (ZoomPanTextureView) view.findViewById(R.id.texture);
     zoomTextureView.setSurfaceTextureListener(this);
     zoomTextureView.setZoomRange(MIN_ZOOM, MAX_ZOOM);
     zoomTextureView.setOnTouchListener(new View.OnTouchListener()
@@ -496,8 +496,9 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
       float scale = getContext().getResources().getDisplayMetrics().density;
       int margin = (int)(5 * scale + 0.5f);
       int extra = Utils.getNavigationBarHeight(getContext(), Configuration.ORIENTATION_LANDSCAPE);
-      ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)snapshotButton.getLayoutParams();
-      lp.setMargins(margin, margin, margin + extra, margin);
+
+        //ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) snapshotButton.getLayoutParams();
+      //lp.setMargins(margin, margin, margin + extra, margin);
     }
 
     return view;
