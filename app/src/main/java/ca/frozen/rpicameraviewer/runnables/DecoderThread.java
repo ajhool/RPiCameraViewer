@@ -10,7 +10,6 @@ import android.view.Surface;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import ca.frozen.rpicameraviewer.App;
 import ca.frozen.rpicameraviewer.activities.PiCamConnectionFragment;
 import ca.frozen.rpicameraviewer.classes.Camera;
 import ca.frozen.rpicameraviewer.classes.HttpReader;
@@ -20,11 +19,12 @@ import ca.frozen.rpicameraviewer.classes.Source;
 import ca.frozen.rpicameraviewer.classes.SpsParser;
 import ca.frozen.rpicameraviewer.classes.TcpIpReader;
 
-    /*
-     * DecoderThread
-     */
-public class DecoderThread extends Thread
-{
+/*
+ * DecoderThread
+ * Responsible for reading in a Video over IP datastream (specifically h.264 encoded video the raspberry pi)
+ * Must call
+ */
+public class DecoderThread extends Thread {
     // local constants
     private final static String TAG = "DecoderThread";
     private final static int BUFFER_TIMEOUT = 10000;
@@ -66,8 +66,7 @@ public class DecoderThread extends Thread
     //******************************************************************************
     // setSurface
     //******************************************************************************
-    public void setSurface(Surface surface, Handler handler, Runnable runner)
-    {
+    public void setSurface(Surface surface, Handler handler, Runnable runner) {
         this.surface = surface;
         this.startVideoHandler = handler;
         this.startVideoRunner = runner;
@@ -90,16 +89,29 @@ public class DecoderThread extends Thread
                         newDecoding = true;
                     }
                 }
-                if (newDecoding)
-                {
+
+                if (newDecoding) {
                     setDecodingState(newDecoding);
                 }
-            }
-            else if (decoding)
-            {
+            } else if (decoding) {
                 setDecodingState(false);
             }
         }
+    }
+
+    /*
+     * isInitialized
+     * Check if the DecoderThread has been properly initialized.
+     * TODO://
+     */
+    private boolean isInitialized(){
+        boolean isInitialized = true;
+
+        if(null == this.surface  || null == this.startVideoHandler || null == this.startVideoRunner){
+            isInitialized = false;
+        }
+
+        return isInitialized;
     }
 
     //******************************************************************************
@@ -115,26 +127,25 @@ public class DecoderThread extends Thread
     //******************************************************************************
     private synchronized void setDecodingState(boolean newDecoding)
     {
-        try
-        {
-            if (newDecoding != decoding && decoder != null)
-            {
-                if (newDecoding)
-                {
+        try {
+            if (newDecoding != decoding && decoder != null) {
+
+                if (newDecoding) {
                     decoder.start();
-                }
-                else
-                {
+                } else {
                     decoder.stop();
                 }
+
                 decoding = newDecoding;
             }
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+
+        }
     }
 
-    //******************************************************************************
-    // run
-    //******************************************************************************
+    /******************************************************************************
+     * TODO(ajhool) add checks inside run that ensure the camera has been properly initialized.
+    ******************************************************************************/
     @Override
     public void run()
     {
@@ -147,13 +158,10 @@ public class DecoderThread extends Thread
         boolean gotHeader = false;
         ByteBuffer[] inputBuffers = null;
 
-        try
-        {
+        try {
             // get the multicast lock if necessary
-            if (mCamera.source.connectionType == Source.ConnectionType.RawMulticast)
-            {
-                if (mWifiManager != null)
-                {
+            if (mCamera.source.connectionType == Source.ConnectionType.RawMulticast) {
+                if (mWifiManager != null) {
                     multicastLock = mWifiManager.createMulticastLock("rpicamlock");
                     multicastLock.acquire();
                 } else {
@@ -166,66 +174,52 @@ public class DecoderThread extends Thread
 
             // create the reader
             source = mCamera.getCombinedSource();
-            if (source.connectionType == Source.ConnectionType.RawMulticast)
-            {
+
+            if (source.connectionType == Source.ConnectionType.RawMulticast) {
                 buffer = new byte[MULTICAST_BUFFER_SIZE];
                 reader = new MulticastReader(source);
-            }
-            else if (source.connectionType == Source.ConnectionType.RawHttp)
-            {
+            } else if (source.connectionType == Source.ConnectionType.RawHttp) {
                 buffer = new byte[HTTP_BUFFER_SIZE];
                 reader = new HttpReader(source);
-            }
-            else
-            {
+            } else {
                 buffer = new byte[TCPIP_BUFFER_SIZE];
                 reader = new TcpIpReader(source);
             }
-            if (!reader.isConnected())
-            {
+
+            if (!reader.isConnected()) {
                 throw new Exception();
             }
 
             // read from the source
-            while (!Thread.interrupted())
-            {
+            while (!Thread.interrupted()) {
                 // read from the stream
                 int len = reader.read(buffer);
                 //Log.d(TAG, String.format("len = %d", len));
 
                 // process the input buffer
-                if (len > 0)
-                {
+                if (len > 0) {
                     numReadErrors = 0;
-                    for (int i = 0; i < len; i++)
-                    {
-                        if (buffer[i] == 0)
-                        {
+                    for (int i = 0; i < len; i++) {
+                        if (buffer[i] == 0) {
                             numZeroes++;
-                        }
-                        else
-                        {
-                            if (buffer[i] == 1)
-                            {
-                                if (numZeroes == 3)
-                                {
-                                    if (gotHeader)
-                                    {
+                        } else {
+                            if (buffer[i] == 1) {
+                                if (numZeroes == 3) {
+                                    if (gotHeader) {
                                         nalLen -= numZeroes;
-                                        if (!gotSPS && (nal[numZeroes + 1] & 0x1F) == 7)
-                                        {
+                                        if (!gotSPS && (nal[numZeroes + 1] & 0x1F) == 7) {
                                             //Log.d(TAG, String.format("SPS: %d = %02X %02X %02X %02X %02X", nalLen, nal[0], nal[1], nal[2], nal[3], nal[4]));
                                             SpsParser parser = new SpsParser(nal, nalLen);
                                             int width = (source.width != 0) ? source.width : parser.width;
                                             int height = (source.height != 0) ? source.height : parser.height;
                                             //Log.d(TAG, String.format("SPS: size = %d x %d", width, height));
                                             format = MediaFormat.createVideoFormat("video/avc", width, height);
-                                            if (source.fps != 0)
-                                            {
+
+                                            if (source.fps != 0) {
                                                 format.setInteger(MediaFormat.KEY_FRAME_RATE, source.fps);
                                             }
-                                            if (source.bps != 0)
-                                            {
+
+                                            if (source.bps != 0) {
                                                 format.setInteger(MediaFormat.KEY_BIT_RATE, source.bps);
                                             }
                                             decoder.configure(format, surface, null, 0);
@@ -233,12 +227,9 @@ public class DecoderThread extends Thread
                                             inputBuffers = decoder.getInputBuffers();
                                             startVideoHandler.post(startVideoRunner);
                                             gotSPS = true;
-                                        }
-                                        if (gotSPS && decoding)
-                                        {
+                                        } if (gotSPS && decoding) {
                                             int index = decoder.dequeueInputBuffer(BUFFER_TIMEOUT);
-                                            if (index >= 0)
-                                            {
+                                            if (index >= 0) {
                                                 ByteBuffer inputBuffer = inputBuffers[index];
                                                 //ByteBuffer inputBuffer = decoder.getInputBuffer(index);
                                                 inputBuffer.put(nal, 0, nalLen);
@@ -248,8 +239,7 @@ public class DecoderThread extends Thread
                                             //Log.d(TAG, String.format("NAL: %d  %d", nalLen, index));
                                         }
                                     }
-                                    for (int j = 0; j < numZeroes; j++)
-                                    {
+                                    for (int j = 0; j < numZeroes; j++) {
                                         nal[j] = 0;
                                     }
                                     nalLen = numZeroes;
@@ -260,22 +250,17 @@ public class DecoderThread extends Thread
                         }
 
                         // add the byte to the NAL
-                        if (gotHeader)
-                        {
-                            if (nalLen == nal.length)
-                            {
+                        if (gotHeader) {
+                            if (nalLen == nal.length) {
                                 nal = Arrays.copyOf(nal, nal.length + NAL_SIZE_INC);
                                 //Log.d(TAG, String.format("NAL size: %d", nal.length));
                             }
                             nal[nalLen++] = buffer[i];
                         }
                     }
-                }
-                else
-                {
+                } else {
                     numReadErrors++;
-                    if (numReadErrors >= MAX_READ_ERRORS)
-                    {
+                    if (numReadErrors >= MAX_READ_ERRORS) {
                         setMessage("Too many read errors, possibly lost connection to camera.");
                         break;
                     }
@@ -283,28 +268,21 @@ public class DecoderThread extends Thread
                 }
 
                 // send an output buffer to the surface
-                if (format != null && decoding)
-                {
+                if (format != null && decoding) {
                     MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
                     int index = decoder.dequeueOutputBuffer(info, BUFFER_TIMEOUT);
-                    if (index >= 0)
-                    {
+                    if (index >= 0) {
                         decoder.releaseOutputBuffer(index, true);
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            if (reader == null || !reader.isConnected())
-            {
+        } catch (Exception ex) {
+            if (reader == null || !reader.isConnected()) {
                 setMessage("Couldn't connect to reader. PiCamConnectionFragment should finish.");
 
                 //TODO: Gracefully handle this error
                 mFragment.noConnection();
-            }
-            else
-            {
+            } else {
                 setMessage("Lost connection.");
             }
             //Log.d(TAG, ex.toString());
@@ -312,39 +290,38 @@ public class DecoderThread extends Thread
         }
 
         // close the reader
-        if (reader != null)
-        {
-            try
-            {
+        if (reader != null) {
+            try {
                 reader.close();
+            } catch (Exception ex) {
+
             }
-            catch (Exception ex) {}
+
             reader = null;
         }
 
         // stop the decoder
-        if (decoder != null)
-        {
-            try
-            {
+        if (decoder != null) {
+            try {
                 setDecodingState(false);
                 decoder.release();
+            } catch (Exception ex) {
+
             }
-            catch (Exception ex) {}
+
             decoder = null;
         }
 
         // release the multicast lock
-        if (multicastLock != null)
-        {
-            try
-            {
-                if (multicastLock.isHeld())
-                {
+        if (multicastLock != null) {
+            try {
+                if (multicastLock.isHeld()) {
                     multicastLock.release();
                 }
+            } catch (Exception ex) {
+
             }
-            catch (Exception ex) {}
+
             multicastLock = null;
         }
     }
