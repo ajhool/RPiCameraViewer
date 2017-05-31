@@ -2,9 +2,12 @@
 <!-- Copyright © 2016 Shawn Baker using the MIT License. -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/video"
     android:keepScreenOn="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#000"
+    tools:context="ca.frozen.rpicameraviewer.mlcameras.MLCameraActivity">
 
 </FrameLayout>

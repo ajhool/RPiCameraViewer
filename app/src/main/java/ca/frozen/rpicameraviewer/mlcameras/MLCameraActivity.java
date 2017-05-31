@@ -26,6 +26,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Size;
 import android.view.KeyEvent;
 import android.view.WindowManager;
@@ -33,18 +35,33 @@ import android.widget.Toast;
 
 import org.tensorflow.demo.CameraConnectionFragment;
 import org.tensorflow.demo.OverlayView;
-import org.tensorflow.demo.R;
 import org.tensorflow.demo.env.Logger;
 
 import java.nio.ByteBuffer;
 
-public abstract class MLCameraActivity extends Activity implements OnImageAvailableListener, CameraConnectionFragment.ConnectionCallback {
+import android.view.View;
+import android.widget.FrameLayout;
+
+import ca.frozen.rpicameraviewer.activities.PiCamConnectionFragment;
+import ca.frozen.rpicameraviewer.classes.Camera;
+import ca.frozen.rpicameraviewer.classes.Utils;
+import ca.frozen.rpicameraviewer.R;
+
+public abstract class MLCameraActivity extends AppCompatActivity implements OnImageAvailableListener, PiCamConnectionFragment.ConnectionCallback {
   private static final Logger LOGGER = new Logger();
 
   private static final int PERMISSIONS_REQUEST = 1;
 
   private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
   private static final String PERMISSION_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+  // instance variables
+  private Camera camera;
+  private FrameLayout frameLayout;
+  private PiCamConnectionFragment cameraDisplayFragment;
+
+  // public constants
+  public final static String CAMERA = "camera";
 
   private boolean debug = false;
 
@@ -54,10 +71,35 @@ public abstract class MLCameraActivity extends Activity implements OnImageAvaila
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     LOGGER.d("onCreate " + this);
-    super.onCreate(null);
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_camera_display);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-    setContentView(R.layout.activity_camera_tf);
+    // load the settings and cameras
+    Utils.loadData();
+
+    // get the camera object
+    Bundle data = getIntent().getExtras();
+    camera = data.getParcelable(CAMERA);
+
+    // get the frame layout, handle system visibility changes
+    frameLayout = (FrameLayout) findViewById(R.id.video);
+    frameLayout.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener()
+    {
+      @Override
+      public void onSystemUiVisibilityChange(int visibility)
+      {
+        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0)
+        {
+          //cameraDisplayFragment.startFadeIn();
+        }
+      }
+    });
+
+    // set full screen layout
+    int visibility = frameLayout.getSystemUiVisibility();
+    visibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+    frameLayout.setSystemUiVisibility(visibility);
 
     if (hasPermission()) {
       setFragment();
@@ -155,17 +197,12 @@ public abstract class MLCameraActivity extends Activity implements OnImageAvaila
   }
 
   public void setFragment() {
-    final Fragment fragment =
-        CameraConnectionFragment.newInstance(
-                this,
-            this,
-            getLayoutId(),
-            getDesiredPreviewFrameSize());
+    // create the video fragment
+    cameraDisplayFragment = PiCamConnectionFragment.newInstance(getLayoutId(), getDesiredPreviewFrameSize(), camera, true);
 
-    getFragmentManager()
-        .beginTransaction()
-        .replace(R.id.container, fragment)
-        .commit();
+    FragmentTransaction fragTran = getSupportFragmentManager().beginTransaction();
+    fragTran.add(R.id.video, cameraDisplayFragment);
+    fragTran.commit();
   }
 
   protected void fillBytes(final Plane[] planes, final byte[][] yuvBytes) {

@@ -59,6 +59,10 @@
             android:parentActivityName=".activities.SelectCameraActivity"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/AppFullScreenTheme"></activity>
+        <activity android:name=".mlcameras.ClassifierActivity"
+            android:screenOrientation="portrait"
+            android:label="PiClassification">
+        </activity>
     </application>
 
 </manifest>

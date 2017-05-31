@@ -31,6 +31,8 @@ import ca.frozen.rpicameraviewer.classes.Camera;
 import ca.frozen.rpicameraviewer.classes.CameraAdapter;
 import ca.frozen.rpicameraviewer.classes.Utils;
 import ca.frozen.rpicameraviewer.R;
+import ca.frozen.rpicameraviewer.mlcameras.ClassifierActivity;
+import ca.frozen.rpicameraviewer.mlcameras.MLCameraActivity;
 
 import org.opencv.android.OpenCVLoader;
 import org.tensorflow.demo.DetectorActivity;
@@ -411,8 +413,10 @@ public class SelectCameraActivity extends AppCompatActivity
 	//******************************************************************************
 	private void startVideoActivity(Camera camera)
 	{
-		Intent intent = new Intent(App.getContext(), VideoActivity.class);
-		intent.putExtra(VideoActivity.CAMERA, camera);
+		//Intent intent = new Intent(App.getContext(), VideoActivity.class);
+		//intent.putExtra(VideoActivity.CAMERA, camera);
+        Intent intent = new Intent(App.getContext(), ClassifierActivity.class);
+        intent.putExtra(MLCameraActivity.CAMERA, camera);
 		startActivity(intent);
 	}
 

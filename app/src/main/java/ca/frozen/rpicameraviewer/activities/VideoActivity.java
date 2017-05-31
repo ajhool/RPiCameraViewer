@@ -4,7 +4,6 @@ package ca.frozen.rpicameraviewer.activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -33,7 +32,7 @@ public class VideoActivity extends AppCompatActivity implements VideoFragment.On
 	{
 		// configure the activity
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_video);
+		setContentView(R.layout.activity_camera_display);
 		//Log.d(TAG, "onCreate");
 
 		// load the settings and cameras

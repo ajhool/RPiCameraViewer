@@ -340,7 +340,6 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
   //TODO: See inner TODO.
   public static PiCamConnectionFragment newInstance(
-          final ConnectionCallback callback,
           final int layout,
           final Size inputSize,
           final Camera camera,
@@ -464,8 +463,12 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     //View view = inflater.inflate(ca.frozen.picamviewer.R.layout.fragment_video, container, false);
     View view = inflater.inflate(layout, container, false);
 
+      /*
+       * TODO: initialization of zoomTextureView might need to move to onViewCreated
+       */
+
     // set the texture listener
-    zoomTextureView = (ZoomPanTextureView)view.findViewById(R.id.video_surface);
+    zoomTextureView = (ZoomPanTextureView) view.findViewById(R.id.video_surface);
     zoomTextureView.setSurfaceTextureListener(this);
     zoomTextureView.setZoomRange(MIN_ZOOM, MAX_ZOOM);
     zoomTextureView.setOnTouchListener(new View.OnTouchListener()
@@ -509,8 +512,6 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   public void onActivityCreated(final Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
   }
-
-
 
   //******************************************************************************
   // onSurfaceTextureAvailable
