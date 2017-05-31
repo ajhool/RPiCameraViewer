@@ -32,7 +32,7 @@ public class DecoderThread extends Thread
     private final static int TCPIP_BUFFER_SIZE = 16384;
     private final static int HTTP_BUFFER_SIZE = 4096;
     private final static int NAL_SIZE_INC = 4096;
-    private final static int MAX_READ_ERRORS = 300;
+    private final static int MAX_READ_ERRORS = 10000;
 
     // instance variables
     private MediaCodec decoder = null;
@@ -71,24 +71,22 @@ public class DecoderThread extends Thread
         this.surface = surface;
         this.startVideoHandler = handler;
         this.startVideoRunner = runner;
-        if (decoder != null)
-        {
-            if (surface != null)
-            {
+        if (decoder != null) {
+            if (surface != null) {
                 boolean newDecoding = decoding;
-                if (decoding)
-                {
+
+                if (decoding) {
                     setDecodingState(false);
                 }
-                if (format != null)
-                {
-                    try
-                    {
+
+                if (format != null) {
+                    try {
                         decoder.configure(format, surface, null, 0);
+                    } catch (Exception ex) {
+
                     }
-                    catch (Exception ex) {}
-                    if (!newDecoding)
-                    {
+
+                    if (!newDecoding) {
                         newDecoding = true;
                     }
                 }
@@ -278,7 +276,7 @@ public class DecoderThread extends Thread
                     numReadErrors++;
                     if (numReadErrors >= MAX_READ_ERRORS)
                     {
-                        setMessage("Lost Connection.");
+                        setMessage("Too many read errors, possibly lost connection to camera.");
                         break;
                     }
                     //Log.d(TAG, "len == 0");

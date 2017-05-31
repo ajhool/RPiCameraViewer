@@ -442,15 +442,14 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
     // create the start video handler and runnable
     startVideoHandler = new Handler();
-    startVideoRunner = new Runnable()
-    {
+    startVideoRunner = new Runnable() {
       @Override
       public void run()
       {
-        MediaFormat format = decoder.getMediaFormat();
-        int videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
-        int videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
-        zoomTextureView.setVideoSize(videoWidth, videoHeight);
+        //MediaFormat format = decoder.getMediaFormat();
+        //int videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
+        //int videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
+        //zoomTextureView.setVideoSize(videoWidth, videoHeight);
       }
     };
   }
@@ -522,7 +521,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   {
     if (decoder != null)
     {
-      decoder.setSurface(new Surface(surfaceTexture), startVideoHandler, startVideoRunner);
+      //decoder.setSurface(new Surface(surfaceTexture), startVideoHandler, startVideoRunner);
     }
   }
 
@@ -542,7 +541,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   {
     if (decoder != null)
     {
-      decoder.setSurface(null, null, null);
+      //decoder.setSurface(null, null, null);
     }
     return true;
   }
@@ -563,6 +562,23 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   public void onResume() {
     super.onResume();
     startBackgroundThread();
+
+    Size[] sizes = new Size[]{new Size(1280, 720)};
+
+    previewSize = chooseOptimalSize(sizes, inputSize.getWidth(), inputSize.getHeight());
+    //TODO(ajhool): Remove hardware of sensorOrientation to al;
+    sensorOrientation = Configuration.ORIENTATION_LANDSCAPE;
+    cameraConnectionCallback.onPreviewSizeChosen(previewSize, sensorOrientation);
+
+    // Create the reader for the preview frames.
+    previewReader =
+            ImageReader.newInstance(
+                    previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YUV_420_888, 2);
+
+    previewReader.setOnImageAvailableListener(imageListener, backgroundHandler);
+
+    decoder.setSurface(previewReader.getSurface(), startVideoHandler, startVideoRunner);
+    decoder.start();
 
     // When the screen is turned off and turned back on, the SurfaceTexture is already
     // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
@@ -614,9 +630,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
     // create the decoder thread
     decoder = new DecoderThread();
-    decoder.start();
 
-    //TODO: These lines are untested, were added after moving DecoderThread to separate class.
     final WifiManager wifi = (WifiManager) getActivity().getApplicationContext().getSystemService(App.getContext().WIFI_SERVICE);
     decoder.setWifiManager(wifi);
     decoder.setCamera(camera);
@@ -652,53 +666,57 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
    */
   private void setUpCameraOutputs(final int width, final int height) {
     final Activity activity = getActivity();
-    final CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+    //final CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
     try {
-      for (final String cameraId : manager.getCameraIdList()) {
-        final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+      //for (final String cameraId : manager.getCameraIdList()) {
+        //final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
         // We don't use a front facing camera in this sample.
-        final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-        if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
-          continue;
-        }
+       // final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+        //if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+        //  continue;
+       // }
 
-        final StreamConfigurationMap map =
-            characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        //final StreamConfigurationMap map =
+        //    characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
-        if (map == null) {
-          continue;
-        }
+       // if (map == null) {
+       //   continue;
+       // }
 
         // For still image captures, we use the largest available size.
-        final Size largest =
-            Collections.max(
-                Arrays.asList(map.getOutputSizes(ImageFormat.YUV_420_888)),
-                new CompareSizesByArea());
+       // final Size largest =
+         //   Collections.max(
+          //      Arrays.asList(map.getOutputSizes(ImageFormat.YUV_420_888)),
+           //     new CompareSizesByArea());
 
-        sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+        //sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
         // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
         // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
         // garbage capture data.
-        previewSize =
-            chooseOptimalSize(
-                map.getOutputSizes(SurfaceTexture.class),
-                inputSize.getWidth(),
-                inputSize.getHeight());
+        //previewSize =
+        //    chooseOptimalSize(
+        //        map.getOutputSizes(SurfaceTexture.class),
+        //        inputSize.getWidth(),
+        //        inputSize.getHeight());
 
         // We fit the aspect ratio of TextureView to the size of preview we picked.
         final int orientation = getResources().getConfiguration().orientation;
+
+        //TODO(ajhool): Remove hardware of sensorOrientation to equal orientation;
+        sensorOrientation = orientation;
+
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
           zoomTextureView.setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
         } else {
           zoomTextureView.setAspectRatio(previewSize.getHeight(), previewSize.getWidth());
         }
 
-        PiCamConnectionFragment.this.cameraId = cameraId;
-      }
-    } catch (final CameraAccessException e) {
-      LOGGER.e(e, "Exception!");
+        //PiCamConnectionFragment.this.cameraId = cameraId;
+      //}
+    //} catch (final CameraAccessException e) {
+    //  LOGGER.e(e, "Exception!");
     } catch (final NullPointerException e) {
       // Currently an NPE is thrown when the Camera2API is used but not supported on the
       // device this code runs.
@@ -726,9 +744,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
       if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
         throw new RuntimeException("Time out waiting to lock camera opening.");
       }
-      manager.openCamera(cameraId, stateCallback, backgroundHandler);
-    } catch (final CameraAccessException e) {
-      LOGGER.e(e, "Exception!");
+      //manager.openCamera(cameraId, stateCallback, backgroundHandler);
     } catch (final InterruptedException e) {
       throw new RuntimeException("Interrupted while trying to lock camera opening.", e);
     }
