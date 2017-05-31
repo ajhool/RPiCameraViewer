@@ -190,19 +190,35 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
    */
   private int layout;
 
-
   /*
-   * From RPi VideoFragment
-   */
-  /*
-   * @networkCameraSource represents the picamera object
+   * @networkCameraSource holds characteristics of a network camera source
+   *
    */
   private NetworkCameraSource networkCameraSource;
+
+  /*
+   * @fullScreen flag for activating fullscreen mode.
+   */
   private boolean fullScreen;
+
+  /*
+   * @decoder Background thread for decoding h264 data from the network camera.
+   *  Requires a thread for
+   */
   private DecoderThread decoder;
+
+  /*
+   * @zoomTexureView displays the Network camera video with the ability to zoom in and pan.
+   * TODO: Untested
+   */
   private ZoomPanTextureView zoomTextureView;
-  private Runnable finishRunner, startVideoRunner;
-  private Handler finishHandler, startVideoHandler;
+
+  /*
+   * @startVideoRunner : Ensures that the network camera is properly started
+   * @finishRunner : Ensures that the Network camera is properly shutdown
+   */
+  private Runnable startVideoRunner, finishRunner;
+  private Handler startVideoHandler, finishHandler;
 
   /**
    * Callback for Activities to use to initialize their data once the
@@ -251,7 +267,13 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   }
 
   /*
-   * Instantiate the Fragment that connects the PiCam to the TensorFlow processing.
+   * @newInstance Instantiate the Fragment that connects the PiCam to the TensorFlow processing.
+   * @param layout The layout for the fragment to use
+   *  //TODO: Change architecture so that layout is a property of container activity
+   * @param networkCameraSource Information for connecting to the network camera source, like IP, port, etc.
+   * @param fullScreen Flag for the fragment to take fullscreen
+   *
+   * @return The created {@code PiCamConnectionFragment}
    */
   public static PiCamConnectionFragment newInstance(
       final int layout,
@@ -337,7 +359,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     networkCameraSource = getArguments().getParcelable(CAMERA);
     fullScreen = getArguments().getBoolean(FULL_SCREEN);
     layout = getArguments().getInt(LAYOUT);
-      inputSize = getArguments().getSize(INPUT_SIZE);
+    inputSize = getArguments().getSize(INPUT_SIZE);
 
 
       // create the finish handler and runnable
@@ -399,17 +421,6 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
         return false;
       }
     });
-
-    // move the snapshot button over to account for the navigation bar
-    if (fullScreen)
-    {
-      float scale = getContext().getResources().getDisplayMetrics().density;
-      int margin = (int)(5 * scale + 0.5f);
-      int extra = Utils.getNavigationBarHeight(getContext(), Configuration.ORIENTATION_LANDSCAPE);
-
-        //ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) snapshotButton.getLayoutParams();
-      //lp.setMargins(margin, margin, margin + extra, margin);
-    }
 
     return view;
   }
@@ -477,6 +488,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     Size[] sizes = new Size[]{new Size(1280, 720)};
 
     previewSize = chooseOptimalSize(sizes, inputSize.getWidth(), inputSize.getHeight());
+
     //TODO(ajhool): Remove hardware of sensorOrientation to al;
     sensorOrientation = Configuration.ORIENTATION_LANDSCAPE;
     cameraConnectionCallback.onPreviewSizeChosen(previewSize, sensorOrientation);
