@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import ca.frozen.rpicameraviewer.activities.PiCamConnectionFragment;
-import ca.frozen.rpicameraviewer.classes.Camera;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
 import ca.frozen.rpicameraviewer.classes.HttpReader;
 import ca.frozen.rpicameraviewer.classes.MulticastReader;
 import ca.frozen.rpicameraviewer.classes.RawH264Reader;
@@ -48,11 +48,11 @@ public class DecoderThread extends Thread {
 
     private PiCamConnectionFragment mFragment;
 
-    private Camera mCamera;
+    private NetworkCameraSource mNetworkCameraSource;
     private WifiManager mWifiManager;
 
-    public void setCamera(Camera camera) {
-        mCamera = camera;
+    public void setCamera(NetworkCameraSource networkCameraSource) {
+        mNetworkCameraSource = networkCameraSource;
     }
 
     public void setWifiManager(WifiManager wifi){
@@ -160,7 +160,7 @@ public class DecoderThread extends Thread {
 
         try {
             // get the multicast lock if necessary
-            if (mCamera.source.connectionType == Source.ConnectionType.RawMulticast) {
+            if (mNetworkCameraSource.source.connectionType == Source.ConnectionType.RawMulticast) {
                 if (mWifiManager != null) {
                     multicastLock = mWifiManager.createMulticastLock("rpicamlock");
                     multicastLock.acquire();
@@ -173,7 +173,7 @@ public class DecoderThread extends Thread {
             decoder = MediaCodec.createDecoderByType("video/avc");
 
             // create the reader
-            source = mCamera.getCombinedSource();
+            source = mNetworkCameraSource.getCombinedSource();
 
             if (source.connectionType == Source.ConnectionType.RawMulticast) {
                 buffer = new byte[MULTICAST_BUFFER_SIZE];

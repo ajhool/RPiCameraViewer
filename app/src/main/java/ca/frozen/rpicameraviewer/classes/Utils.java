@@ -15,7 +15,6 @@ import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +39,7 @@ import ca.frozen.rpicameraviewer.R;
 public class Utils
 {
 	private static Settings settings = null;
-	private static List<Camera> cameras = null;
+	private static List<NetworkCameraSource> networkCameraSources = null;
 
 	//******************************************************************************
 	// loadData
@@ -76,14 +75,14 @@ public class Utils
 			}
 		}
 
-		// load the cameras
-		if (cameras == null)
+		// load the networkCameraSources
+		if (networkCameraSources == null)
 		{
 			if (preferences == null)
 			{
 				preferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
 			}
-			cameras = new ArrayList<>();
+			networkCameraSources = new ArrayList<>();
 			try
 			{
 				String camerasString = preferences.getString(App.getStr(R.string.settings_cameras), "");
@@ -93,8 +92,8 @@ public class Utils
 					for (int i = 0; i < arr.length(); i++)
 					{
 						JSONObject obj = arr.getJSONObject(i);
-						Camera camera = new Camera(obj);
-						cameras.add(camera);
+						NetworkCameraSource networkCameraSource = new NetworkCameraSource(obj);
+						networkCameraSources.add(networkCameraSource);
 					}
 				}
 			}
@@ -102,7 +101,7 @@ public class Utils
 			{
 				save = true;
 			}
-			Collections.sort(cameras);
+			Collections.sort(networkCameraSources);
 		}
 
 		// save the data if we changed something
@@ -118,7 +117,7 @@ public class Utils
 	public static void reloadData()
 	{
 		settings = null;
-		cameras = null;
+		networkCameraSources = null;
 		loadData();
 	}
 
@@ -142,8 +141,8 @@ public class Utils
 			editor.putString(App.getStr(R.string.settings_settings), obj.toString());
 		}
 
-		// save the cameras
-		if (cameras != null)
+		// save the networkCameraSources
+		if (networkCameraSources != null)
 		{
 			if (preferences == null)
 			{
@@ -151,9 +150,9 @@ public class Utils
 				editor = preferences.edit();
 			}
 			JSONArray arr = new JSONArray();
-			for (Camera camera : cameras)
+			for (NetworkCameraSource networkCameraSource : networkCameraSources)
 			{
-				arr.put(camera.toJson());
+				arr.put(networkCameraSource.toJson());
 			}
 			editor.putString(App.getStr(R.string.settings_cameras), arr.toString());
 		}
@@ -195,44 +194,44 @@ public class Utils
 	//******************************************************************************
 	// getNetworkCameras
 	//******************************************************************************
-	public static List<Camera> getNetworkCameras(String network)
+	public static List<NetworkCameraSource> getNetworkCameras(String network)
 	{
 		loadData();
 
-		// find the cameras for the network
-		List<Camera> networkCameras = new ArrayList<>();
-		for (Camera camera : cameras)
+		// find the networkCameraSources for the network
+		List<NetworkCameraSource> networkNetworkCameraSources = new ArrayList<>();
+		for (NetworkCameraSource networkCameraSource : networkCameraSources)
 		{
-			if (camera.network.equals(network))
+			if (networkCameraSource.network.equals(network))
 			{
-				networkCameras.add(camera);
+				networkNetworkCameraSources.add(networkCameraSource);
 			}
 		}
 
-		return networkCameras;
+		return networkNetworkCameraSources;
 	}
 
 	//******************************************************************************
-	// getCameras
+	// getNetworkCameraSources
 	//******************************************************************************
-	public static List<Camera> getCameras()
+	public static List<NetworkCameraSource> getNetworkCameraSources()
 	{
 		loadData();
-		return cameras;
+		return networkCameraSources;
 	}
 
 	//******************************************************************************
 	// findCamera
 	//******************************************************************************
-	public static Camera findCamera(String name)
+	public static NetworkCameraSource findCamera(String name)
 	{
 		loadData();
 
-		for (Camera camera : cameras)
+		for (NetworkCameraSource networkCameraSource : networkCameraSources)
 		{
-			if (camera.name.equals(name))
+			if (networkCameraSource.name.equals(name))
 			{
-				return camera;
+				return networkCameraSource;
 			}
 		}
 		return null;
@@ -365,20 +364,20 @@ public class Utils
 	//******************************************************************************
 	// getMaxCameraNumber
 	//******************************************************************************
-	public static int getMaxCameraNumber(List<Camera> cameras)
+	public static int getMaxCameraNumber(List<NetworkCameraSource> networkCameraSources)
 	{
 		// get the maximum number from the existing camera names
 		int max = 0;
 		String defaultName = Utils.getDefaultCameraName() + " ";
-		for (int i = 0; i < cameras.size(); i++)
+		for (int i = 0; i < networkCameraSources.size(); i++)
 		{
-			Camera camera = cameras.get(i);
-			if (camera.name.startsWith(defaultName))
+			NetworkCameraSource networkCameraSource = networkCameraSources.get(i);
+			if (networkCameraSource.name.startsWith(defaultName))
 			{
 				int num = -1;
 				try
 				{
-					num = Integer.parseInt(camera.name.substring(defaultName.length()));
+					num = Integer.parseInt(networkCameraSource.name.substring(defaultName.length()));
 				}
 				catch (Exception ex) {}
 				if (num != -1)
@@ -393,9 +392,9 @@ public class Utils
 	//******************************************************************************
 	// getNextCameraName
 	//******************************************************************************
-	public static String getNextCameraName(List<Camera> cameras)
+	public static String getNextCameraName(List<NetworkCameraSource> networkCameraSources)
 	{
-		return getDefaultCameraName() + " " + (getMaxCameraNumber(cameras) + 1);
+		return getDefaultCameraName() + " " + (getMaxCameraNumber(networkCameraSources) + 1);
 	}
 
 	//******************************************************************************

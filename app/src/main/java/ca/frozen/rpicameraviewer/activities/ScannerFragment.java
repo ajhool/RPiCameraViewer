@@ -27,7 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import ca.frozen.rpicameraviewer.App;
-import ca.frozen.rpicameraviewer.classes.Camera;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
 import ca.frozen.rpicameraviewer.classes.HttpReader;
 import ca.frozen.rpicameraviewer.classes.Settings;
 import ca.frozen.rpicameraviewer.classes.Source;
@@ -57,7 +57,7 @@ public class ScannerFragment extends DialogFragment
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 
-		// load the settings and cameras
+		// load the settings and networkCameraSources
 		Utils.loadData();
 
 		// create and run the scanner asynchronously
@@ -181,7 +181,7 @@ public class ScannerFragment extends DialogFragment
 		private WeakReference<ScannerFragment> fragmentWeakRef;
 		private String ipAddress, network;
 		private int device, numDone;
-		private List<Camera> cameras, newCameras;
+		private List<NetworkCameraSource> networkCameraSources, newNetworkCameraSources;
 		private Settings settings;
 
 		//******************************************************************************
@@ -204,8 +204,8 @@ public class ScannerFragment extends DialogFragment
 			settings = Utils.getSettings();
 			device = 0;
 			numDone = 0;
-			cameras = Utils.getNetworkCameras(network);
-			newCameras = new ArrayList<>();
+			networkCameraSources = Utils.getNetworkCameras(network);
+			newNetworkCameraSources = new ArrayList<>();
 		}
 
 		//******************************************************************************
@@ -241,8 +241,8 @@ public class ScannerFragment extends DialogFragment
 								Socket socket = TcpIpReader.getConnection(address, settings.rawTcpIpSource.port);
 								if (socket != null)
 								{
-									Camera camera = new Camera(Source.ConnectionType.RawTcpIp, network, address, settings.rawTcpIpSource.port);
-									addCamera(camera);
+									NetworkCameraSource networkCameraSource = new NetworkCameraSource(Source.ConnectionType.RawTcpIp, network, address, settings.rawTcpIpSource.port);
+									addCamera(networkCameraSource);
 									socket.close();
 									found = true;
 								}
@@ -264,8 +264,8 @@ public class ScannerFragment extends DialogFragment
 										if (page.contains("UV4L Streaming Server"))
 										{
 											address += "/stream/video.h264";
-											Camera camera = new Camera(Source.ConnectionType.RawHttp, network, address, settings.rawHttpSource.port);
-											addCamera(camera);
+											NetworkCameraSource networkCameraSource = new NetworkCameraSource(Source.ConnectionType.RawHttp, network, address, settings.rawHttpSource.port);
+											addCamera(networkCameraSource);
 											http.disconnect();
 											found = true;
 										}
@@ -291,8 +291,8 @@ public class ScannerFragment extends DialogFragment
 					SystemClock.sleep(SLEEP_TIMEOUT);
 				}
 
-				// add the new cameras
-				if (!isCancelled() && newCameras.size() > 0)
+				// add the new networkCameraSources
+				if (!isCancelled() && newNetworkCameraSources.size() > 0)
 				{
 					addCameras();
 				}
@@ -315,7 +315,7 @@ public class ScannerFragment extends DialogFragment
 					public void run()
 					{
 						cancelButton.setText(App.getStr(R.string.done));
-						if (newCameras.size() > 0)
+						if (newNetworkCameraSources.size() > 0)
 						{
 							activity.updateCameras();
 							dismissHandler.postDelayed(dismissRunner, DISMISS_TIMEOUT);
@@ -330,28 +330,28 @@ public class ScannerFragment extends DialogFragment
 		//******************************************************************************
 		private void addCameras()
 		{
-			// sort the new cameras by IP address
-			Collections.sort(newCameras, new Comparator<Camera>()
+			// sort the new networkCameraSources by IP address
+			Collections.sort(newNetworkCameraSources, new Comparator<NetworkCameraSource>()
 			{
 				@Override
-				public int compare(Camera camera1, Camera camera2)
+				public int compare(NetworkCameraSource networkCameraSource1, NetworkCameraSource networkCameraSource2)
 				{
-					int octet1 = getLastOctet(camera1.source.address);
-					int octet2 = getLastOctet(camera2.source.address);
+					int octet1 = getLastOctet(networkCameraSource1.source.address);
+					int octet2 = getLastOctet(networkCameraSource2.source.address);
 					return octet1 - octet2;
 				}
 			});
 
 			// get the maximum number from the existing camera names
-			int max = Utils.getMaxCameraNumber(cameras);
+			int max = Utils.getMaxCameraNumber(networkCameraSources);
 
-			// set the camera names and add the new cameras to the list of all cameras
+			// set the camera names and add the new networkCameraSources to the list of all networkCameraSources
 			String defaultName = Utils.getDefaultCameraName() + " ";
-			List<Camera> allCameras = Utils.getCameras();
-			for (Camera camera : newCameras)
+			List<NetworkCameraSource> allNetworkCameraSources = Utils.getNetworkCameraSources();
+			for (NetworkCameraSource networkCameraSource : newNetworkCameraSources)
 			{
-				camera.name = defaultName + ++max;
-				allCameras.add(camera);
+				networkCameraSource.name = defaultName + ++max;
+				allNetworkCameraSources.add(networkCameraSource);
 			}
 		}
 
@@ -389,13 +389,13 @@ public class ScannerFragment extends DialogFragment
 		//******************************************************************************
 		// addCamera
 		//******************************************************************************
-		private synchronized void addCamera(Camera newCamera)
+		private synchronized void addCamera(NetworkCameraSource newNetworkCameraSource)
 		{
 			boolean found = false;
-			for (Camera camera : cameras)
+			for (NetworkCameraSource networkCameraSource : networkCameraSources)
 			{
-				if (newCamera.source.address.equals(camera.source.address) &&
-					newCamera.source.port == camera.source.port)
+				if (newNetworkCameraSource.source.address.equals(networkCameraSource.source.address) &&
+					newNetworkCameraSource.source.port == networkCameraSource.source.port)
 				{
 					found = true;
 					break;
@@ -403,7 +403,7 @@ public class ScannerFragment extends DialogFragment
 			}
 			if (!found)
 			{
-				newCameras.add(newCamera);
+				newNetworkCameraSources.add(newNetworkCameraSource);
 			}
 		}
 
@@ -444,8 +444,8 @@ public class ScannerFragment extends DialogFragment
 						message.setText(String.format(App.getStr(R.string.scanning_on_ports),
 										settings.rawTcpIpSource.port, settings.rawHttpSource.port));
 						progress.setProgress(numDone);
-						status.setText(String.format(App.getStr(R.string.num_new_cameras_found), newCameras.size()));
-						if (newCameras.size() > 0)
+						status.setText(String.format(App.getStr(R.string.num_new_cameras_found), newNetworkCameraSources.size()));
+						if (newNetworkCameraSources.size() > 0)
 						{
 							status.setTextColor(ContextCompat.getColor(App.getContext(), R.color.good_text));
 						}

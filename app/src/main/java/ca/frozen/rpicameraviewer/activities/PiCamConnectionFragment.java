@@ -21,11 +21,7 @@
 package ca.frozen.rpicameraviewer.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
@@ -33,17 +29,13 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
-import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
 import android.media.ImageReader.OnImageAvailableListener;
-import android.media.MediaCodec;
-import android.media.MediaFormat;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -57,14 +49,8 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
-
-//import org.tensorflow.demo.AutoFitTextureView;
 import org.tensorflow.demo.env.Logger;
-
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,69 +59,24 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-
 /*
  * Imports below this line are from app
  */
 import ca.frozen.rpicameraviewer.App;
-import ca.frozen.rpicameraviewer.classes.Camera;
-import ca.frozen.rpicameraviewer.classes.RawH264Reader;
-import ca.frozen.rpicameraviewer.classes.Source;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
 import ca.frozen.rpicameraviewer.runnables.DecoderThread;
 import ca.frozen.rpicameraviewer.views.ZoomPanTextureView;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.SurfaceTexture;
-import android.media.MediaActionSound;
-import android.media.MediaCodec;
-import android.media.MediaFormat;
-import android.net.wifi.WifiManager;
-import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.Surface;
-import android.view.TextureView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import java.nio.ByteBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-
-import ca.frozen.rpicameraviewer.App;
 import ca.frozen.rpicameraviewer.R;
-import ca.frozen.rpicameraviewer.classes.Camera;
-import ca.frozen.rpicameraviewer.classes.HttpReader;
-import ca.frozen.rpicameraviewer.classes.MulticastReader;
-import ca.frozen.rpicameraviewer.classes.RawH264Reader;
-import ca.frozen.rpicameraviewer.classes.Source;
-import ca.frozen.rpicameraviewer.classes.SpsParser;
-import ca.frozen.rpicameraviewer.classes.TcpIpReader;
 import ca.frozen.rpicameraviewer.classes.Utils;
-import ca.frozen.rpicameraviewer.views.ZoomPanTextureView;
-
 
 public class PiCamConnectionFragment extends Fragment implements TextureView.SurfaceTextureListener {
   private static final Logger LOGGER = new Logger();
 
   /**
-   * The camera preview size will be chosen to be the smallest frame by pixel size capable of
+   * The networkCameraSource preview size will be chosen to be the smallest frame by pixel size capable of
    * containing a DESIRED_SIZE x DESIRED_SIZE square.
    */
   private static final int MINIMUM_PREVIEW_SIZE = 320;
@@ -149,10 +90,10 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   /*
    * Bundle Argument constants
    */
-  public final static String CAMERA = "camera";
+  public final static String CAMERA = "networkCameraSource";
   public final static String FULL_SCREEN = "full_screen";
-    public final static String LAYOUT = "layout";
-    public final static String INPUT_SIZE = "input_size";
+  public final static String LAYOUT = "layout";
+  public final static String INPUT_SIZE = "input_size";
 
   private final static int FINISH_TIMEOUT = 5000;
 
@@ -167,7 +108,6 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
    */
   private final static int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
 
-
   static {
     ORIENTATIONS.append(Surface.ROTATION_0, 90);
     ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -176,52 +116,17 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   }
 
   /**
-   * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
-   * {@link TextureView}.
-   */
-  private final TextureView.SurfaceTextureListener surfaceTextureListener =
-      new TextureView.SurfaceTextureListener() {
-        @Override
-        public void onSurfaceTextureAvailable(
-            final SurfaceTexture texture, final int width, final int height) {
-          //openCamera(width, height);
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(
-            final SurfaceTexture texture, final int width, final int height) {
-          configureTransform(width, height);
-        }
-
-        @Override
-        public boolean onSurfaceTextureDestroyed(final SurfaceTexture texture) {
-          return true;
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(final SurfaceTexture texture) {}
-      };
-
-  /**
-   * Callback for Activities to use to initialize their data once the
-   * selected preview size is known.
-   */
-  public interface ConnectionCallback {
-    void onPreviewSizeChosen(Size size, int cameraRotation);
-  }
-
-  /**
    * ID of the current {@link CameraDevice}.
    */
   private String cameraId;
 
   /**
-   //* An {@link AutoFitTextureView} for camera preview.
+   //* An {@link AutoFitTextureView} for networkCameraSource preview.
    */
   //private AutoFitTextureView textureView;
 
   /**
-   * A {@link CameraCaptureSession } for camera preview.
+   * A {@link CameraCaptureSession } for networkCameraSource preview.
    */
   private CameraCaptureSession captureSession;
 
@@ -231,47 +136,14 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   private CameraDevice cameraDevice;
 
   /**
-   * The rotation in degrees of the camera sensor from the display.
+   * The rotation in degrees of the networkCameraSource sensor from the display.
    */
   private Integer sensorOrientation;
 
   /**
-   * The {@link Size} of camera preview.
+   * The {@link Size} of networkCameraSource preview.
    */
   private Size previewSize;
-
-  /**
-   * {@link CameraDevice.StateCallback}
-   * is called when {@link CameraDevice} changes its state.
-   */
-  private final CameraDevice.StateCallback stateCallback =
-      new CameraDevice.StateCallback() {
-        @Override
-        public void onOpened(final CameraDevice cd) {
-          // This method is called when the camera is opened.  We start camera preview here.
-          cameraOpenCloseLock.release();
-          cameraDevice = cd;
-          createCameraPreviewSession();
-        }
-
-        @Override
-        public void onDisconnected(final CameraDevice cd) {
-          cameraOpenCloseLock.release();
-          cd.close();
-          cameraDevice = null;
-        }
-
-        @Override
-        public void onError(final CameraDevice cd, final int error) {
-          cameraOpenCloseLock.release();
-          cd.close();
-          cameraDevice = null;
-          final Activity activity = getActivity();
-          if (null != activity) {
-            activity.finish();
-          }
-        }
-      };
 
   /**
    * An additional thread for running tasks that shouldn't block the UI.
@@ -289,7 +161,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   private ImageReader previewReader;
 
   /**
-   * {@link CaptureRequest.Builder} for the camera preview
+   * {@link CaptureRequest.Builder} for the networkCameraSource preview
    */
   private CaptureRequest.Builder previewRequestBuilder;
 
@@ -299,7 +171,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   private CaptureRequest previewRequest;
 
   /**
-   * A {@link Semaphore} to prevent the app from exiting before closing the camera.
+   * A {@link Semaphore} to prevent the app from exiting before closing the networkCameraSource.
    */
   private final Semaphore cameraOpenCloseLock = new Semaphore(1);
 
@@ -313,58 +185,97 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
   /**
    * The layout identifier to inflate for this Fragment.
+   * Each detector activity has a slightly different layout
+   * @TODO(ajhool): This is stupid -- the activity should handle this. Get rid of it.
    */
   private int layout;
 
-  private ConnectionCallback cameraConnectionCallback;
 
   /*
    * From RPi VideoFragment
    */
-  private Camera camera;
+  /*
+   * @networkCameraSource represents the picamera object
+   */
+  private NetworkCameraSource networkCameraSource;
   private boolean fullScreen;
   private DecoderThread decoder;
   private ZoomPanTextureView zoomTextureView;
-  private TextView nameView, messageView;
-  //private Button snapshotButton;
-  private Runnable fadeInRunner, fadeOutRunner, finishRunner, startVideoRunner;
-  private Handler fadeInHandler, fadeOutHandler, finishHandler, startVideoHandler;
+  private Runnable finishRunner, startVideoRunner;
+  private Handler finishHandler, startVideoHandler;
 
-  public PiCamConnectionFragment() {
-      //Required default constructor.
-  }
-
-    /*
-   * Instantiate the Fragment that connects the PiCam to the TensorFlow processing.
+  /**
+   * Callback for Activities to use to initialize their data once the
+   * selected preview size is known.
    */
-
-  //TODO: See inner TODO.
-  public static PiCamConnectionFragment newInstance(
-          final int layout,
-          final Size inputSize,
-          final Camera camera,
-          final boolean fullScreen) {
-
-    //TODO: Need to blend VideoFragment into PiCamConnectionFragment
-
-      PiCamConnectionFragment piCamConnectionFragment = new PiCamConnectionFragment();
-
-      Bundle args = new Bundle();
-      args.putParcelable(CAMERA, camera);
-      args.putBoolean(FULL_SCREEN, fullScreen);
-      args.putInt(LAYOUT, layout);
-      args.putSize(INPUT_SIZE, inputSize);
-
-      piCamConnectionFragment.setArguments(args);
-
-      return piCamConnectionFragment;
+  public interface ConnectionCallback {
+    void onPreviewSizeChosen(Size size, int cameraRotation);
   }
 
   /**
-   * Given {@code choices} of {@code Size}s supported by a camera, chooses the smallest one whose
+   * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
+   * {@link TextureView}.
+   */
+  //TODO: Currently not used. Either remove, move, or integrate.
+  private final TextureView.SurfaceTextureListener surfaceTextureListener =
+      new TextureView.SurfaceTextureListener() {
+        @Override
+        public void onSurfaceTextureAvailable( final SurfaceTexture texture, final int width, final int height) {
+          //openCamera(width, height);
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(final SurfaceTexture texture, final int width, final int height) {
+          configureTransform(width, height);
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(final SurfaceTexture texture) {
+          return true;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(final SurfaceTexture texture) {}
+      };
+
+
+  /*
+   * @cameraConnectionCallback informs listeners when the characteristics of the selected networkCameraSource have been determined
+   */
+  private ConnectionCallback cameraConnectionCallback;
+
+  /*
+   * Required default constructor used by the Android OS. Use newInstance to instantiate from application.
+   */
+  public PiCamConnectionFragment() {
+  }
+
+  /*
+   * Instantiate the Fragment that connects the PiCam to the TensorFlow processing.
+   */
+  public static PiCamConnectionFragment newInstance(
+      final int layout,
+      final Size inputSize,
+      final NetworkCameraSource networkCameraSource,
+      final boolean fullScreen) {
+    PiCamConnectionFragment piCamConnectionFragment = new PiCamConnectionFragment();
+
+    Bundle args = new Bundle();
+    args.putParcelable(CAMERA, networkCameraSource);
+    args.putBoolean(FULL_SCREEN, fullScreen);
+    args.putInt(LAYOUT, layout);
+    args.putSize(INPUT_SIZE, inputSize);
+
+    piCamConnectionFragment.setArguments(args);
+
+    return piCamConnectionFragment;
+  }
+
+  /**
+   * Given {@code choices} of {@code Size}s supported by a networkCameraSource, chooses the smallest one whose
    * width and height are at least as large as the minimum of both, or an exact match if possible.
    *
-   * @param choices The list of sizes that the camera supports for the intended output class
+   * @param choices The list of sizes that the networkCameraSource supports for the intended output class
    * @param width The minimum desired width
    * @param height The minimum desired height
    * @return The optimal {@code Size}, or an arbitrary one if none were big enough
@@ -423,7 +334,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     Utils.loadData();
 
     // get the parameters
-    camera = getArguments().getParcelable(CAMERA);
+    networkCameraSource = getArguments().getParcelable(CAMERA);
     fullScreen = getArguments().getBoolean(FULL_SCREEN);
     layout = getArguments().getInt(LAYOUT);
       inputSize = getArguments().getSize(INPUT_SIZE);
@@ -582,7 +493,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
     // When the screen is turned off and turned back on, the SurfaceTexture is already
     // available, and "onSurfaceTextureAvailable" will not be called. In that case, we can open
-    // a camera and start preview from here (otherwise, we wait until the surface is ready in
+    // a networkCameraSource and start preview from here (otherwise, we wait until the surface is ready in
     // the SurfaceTextureListener).
     if (zoomTextureView.isAvailable()) {
       //openCamera(zoomTextureView.getWidth(), zoomTextureView.getHeight());
@@ -633,7 +544,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
     final WifiManager wifi = (WifiManager) getActivity().getApplicationContext().getSystemService(App.getContext().WIFI_SERVICE);
     decoder.setWifiManager(wifi);
-    decoder.setCamera(camera);
+    decoder.setCamera(networkCameraSource);
     decoder.setParentFragment(this);
   }
 
@@ -659,10 +570,10 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   }
 
   /**
-   * Sets up member variables related to camera.
+   * Sets up member variables related to networkCameraSource.
    *
-   * @param width  The width of available size for camera preview
-   * @param height The height of available size for camera preview
+   * @param width  The width of available size for networkCameraSource preview
+   * @param height The height of available size for networkCameraSource preview
    */
   private void setUpCameraOutputs(final int width, final int height) {
     final Activity activity = getActivity();
@@ -671,7 +582,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
       //for (final String cameraId : manager.getCameraIdList()) {
         //final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
-        // We don't use a front facing camera in this sample.
+        // We don't use a front facing networkCameraSource in this sample.
        // final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
         //if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
         //  continue;
@@ -692,7 +603,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
         //sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
-        // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
+        // Danger, W.R.! Attempting to use too large a preview size could  exceed the networkCameraSource
         // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
         // garbage capture data.
         //previewSize =
@@ -733,7 +644,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
   }
 
   /**
-   * Opens the camera specified by {@link PiCamConnectionFragment#cameraId}.
+   * Opens the networkCameraSource specified by {@link PiCamConnectionFragment#cameraId}.
    */
   private void openCamera(final int width, final int height) {
     setUpCameraOutputs(width, height);
@@ -742,11 +653,11 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     final CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
     try {
       if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-        throw new RuntimeException("Time out waiting to lock camera opening.");
+        throw new RuntimeException("Time out waiting to lock networkCameraSource opening.");
       }
       //manager.openCamera(cameraId, stateCallback, backgroundHandler);
     } catch (final InterruptedException e) {
-      throw new RuntimeException("Interrupted while trying to lock camera opening.", e);
+      throw new RuntimeException("Interrupted while trying to lock networkCameraSource opening.", e);
     }
   }
 
@@ -769,7 +680,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
         previewReader = null;
       }
     } catch (final InterruptedException e) {
-      throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
+      throw new RuntimeException("Interrupted while trying to lock networkCameraSource closing.", e);
     } finally {
       cameraOpenCloseLock.release();
     }
@@ -814,14 +725,14 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
       };
 
   /**
-   * Creates a new {@link CameraCaptureSession} for camera preview.
+   * Creates a new {@link CameraCaptureSession} for networkCameraSource preview.
    */
   private void createCameraPreviewSession() {
     try {
       final SurfaceTexture texture = zoomTextureView.getSurfaceTexture();
       assert texture != null;
 
-      // We configure the size of default buffer to be the size of camera preview we want.
+      // We configure the size of default buffer to be the size of networkCameraSource preview we want.
       texture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
 
       // This is the output Surface we need to start preview.
@@ -831,7 +742,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
       previewRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
       previewRequestBuilder.addTarget(surface);
 
-      LOGGER.i("Opening camera preview: " + previewSize.getWidth() + "x" + previewSize.getHeight());
+      LOGGER.i("Opening networkCameraSource preview: " + previewSize.getWidth() + "x" + previewSize.getHeight());
 
       // Create the reader for the preview frames.
       previewReader =
@@ -841,14 +752,14 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
       previewReader.setOnImageAvailableListener(imageListener, backgroundHandler);
       previewRequestBuilder.addTarget(previewReader.getSurface());
 
-      // Here, we create a CameraCaptureSession for camera preview.
+      // Here, we create a CameraCaptureSession for networkCameraSource preview.
       cameraDevice.createCaptureSession(
           Arrays.asList(surface, previewReader.getSurface()),
           new CameraCaptureSession.StateCallback() {
 
             @Override
             public void onConfigured(final CameraCaptureSession cameraCaptureSession) {
-              // The camera is already closed
+              // The networkCameraSource is already closed
               if (null == cameraDevice) {
                 return;
               }
@@ -856,7 +767,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
               // When the session is ready, we start displaying the preview.
               captureSession = cameraCaptureSession;
               try {
-                // Auto focus should be continuous for camera preview.
+                // Auto focus should be continuous for networkCameraSource preview.
                 previewRequestBuilder.set(
                     CaptureRequest.CONTROL_AF_MODE,
                     CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
@@ -864,7 +775,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
                 previewRequestBuilder.set(
                     CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 
-                // Finally, we start displaying the camera preview.
+                // Finally, we start displaying the networkCameraSource preview.
                 previewRequest = previewRequestBuilder.build();
                 captureSession.setRepeatingRequest(
                     previewRequest, captureCallback, backgroundHandler);
@@ -886,7 +797,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
 
   /**
    * Configures the necessary {@link Matrix} transformation to `mTextureView`.
-   * This method should be called after the camera preview size is determined in
+   * This method should be called after the networkCameraSource preview size is determined in
    * setUpCameraOutputs and also the size of `mTextureView` is fixed.
    *
    * @param viewWidth  The width of `mTextureView`
@@ -952,46 +863,4 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
               });
     }
   }
-
-  /**
-   * Shows an error message dialog.
-   */
-  public static class ErrorDialog extends DialogFragment {
-    private static final String ARG_MESSAGE = "message";
-
-    public static ErrorDialog newInstance(final String message) {
-      final ErrorDialog dialog = new ErrorDialog();
-      final Bundle args = new Bundle();
-      args.putString(ARG_MESSAGE, message);
-      dialog.setArguments(args);
-      return dialog;
-    }
-
-    @Override
-    public Dialog onCreateDialog(final Bundle savedInstanceState) {
-      final Activity activity = getActivity();
-      return new AlertDialog.Builder(activity)
-              .setMessage(getArguments().getString(ARG_MESSAGE))
-              .setPositiveButton(
-                      android.R.string.ok,
-                      new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialogInterface, final int i) {
-                          activity.finish();
-                        }
-                      })
-              .create();
-    }
-  }
-
 }
-
-/*
- * RPi Video Fragment code
- */
-  //******************************************************************************
-  // takeSnapshot
-  //******************************************************************************
-  /*
-    REMOVED. Check out VideoFragment for original implementation
-  */

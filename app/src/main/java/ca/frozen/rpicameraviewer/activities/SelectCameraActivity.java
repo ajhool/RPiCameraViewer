@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ca.frozen.rpicameraviewer.App;
-import ca.frozen.rpicameraviewer.classes.Camera;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
 import ca.frozen.rpicameraviewer.classes.CameraAdapter;
 import ca.frozen.rpicameraviewer.classes.Utils;
 import ca.frozen.rpicameraviewer.R;
@@ -92,7 +92,7 @@ public class SelectCameraActivity extends AppCompatActivity
 			@Override
 			public void onItemClick(AdapterView<?> adaptr, View view, int position, long id)
 			{
-				startVideoActivity(adapter.getCameras().get(position));
+				startVideoActivity(adapter.getNetworkCameraSources().get(position));
 			}
 		});
 
@@ -103,14 +103,14 @@ public class SelectCameraActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view)
 			{
-				//Camera camera = new Camera(Utils.getNextCameraName(adapter.getCameras()), Utils.getSettings().rawTcpIpSource);
+				//NetworkCameraSource camera = new NetworkCameraSource(Utils.getNextCameraName(adapter.getNetworkCameraSources()), Utils.getSettings().rawTcpIpSource);
 				//startCameraActivity(camera);
                 startDetectorActivity();
 			}
 		});
 
 		// do a scan if there are no cameras
-		if (savedInstanceState == null && adapter.getCameras().size() == 0 && Utils.connectedToNetwork())
+		if (savedInstanceState == null && adapter.getNetworkCameraSources().size() == 0 && Utils.connectedToNetwork())
 		{
 			Handler handler = new Handler();
 			handler.postDelayed(new Runnable()
@@ -192,7 +192,7 @@ public class SelectCameraActivity extends AppCompatActivity
 	{
 		// disable Delete All if there are no cameras
 		MenuItem item = menu.findItem(R.id.action_delete_all);
-		item.setEnabled(adapter.getCameras().size() != 0);
+		item.setEnabled(adapter.getNetworkCameraSources().size() != 0);
 
 		// set the network name
 		setNetworkName();
@@ -261,14 +261,14 @@ public class SelectCameraActivity extends AppCompatActivity
 				{
 					if (Utils.getSettings().showAllCameras)
 					{
-						Utils.getCameras().clear();
+						Utils.getNetworkCameraSources().clear();
 					}
 					else
 					{
-						List<Camera> allCameras = Utils.getCameras();
-						for (Camera camera : adapter.getCameras())
+						List<NetworkCameraSource> allNetworkCameraSources = Utils.getNetworkCameraSources();
+						for (NetworkCameraSource networkCameraSource : adapter.getNetworkCameraSources())
 						{
-							allCameras.remove(camera);
+							allNetworkCameraSources.remove(networkCameraSource);
 						}
 					}
 					updateCameras();
@@ -333,22 +333,22 @@ public class SelectCameraActivity extends AppCompatActivity
 	@Override
 	public boolean onContextItemSelected(MenuItem item)
 	{
-		final Camera camera;
+		final NetworkCameraSource networkCameraSource;
 		AdapterView.AdapterContextMenuInfo info;
 
 		switch (item.getItemId())
 		{
-			// edit the selected camera
+			// edit the selected networkCameraSource
 			case R.id.action_edit:
 				info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-				camera = adapter.getCameras().get(info.position);
-				startCameraActivity(camera);
+				networkCameraSource = adapter.getNetworkCameraSources().get(info.position);
+				startCameraActivity(networkCameraSource);
 				return true;
 
-			// prompt the user to delete the selected camera
+			// prompt the user to delete the selected networkCameraSource
 			case R.id.action_delete:
 				info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-				camera = adapter.getCameras().get(info.position);
+				networkCameraSource = adapter.getNetworkCameraSources().get(info.position);
 				AlertDialog.Builder alert = new AlertDialog.Builder(this);
 				alert.setMessage(R.string.ok_to_delete_camera);
 				alert.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
@@ -356,7 +356,7 @@ public class SelectCameraActivity extends AppCompatActivity
 					@Override
 					public void onClick(DialogInterface dialog, int which)
 					{
-						Utils.getCameras().remove(camera);
+						Utils.getNetworkCameraSources().remove(networkCameraSource);
 						updateCameras();
 						dialog.dismiss();
 					}
@@ -392,10 +392,10 @@ public class SelectCameraActivity extends AppCompatActivity
 	//******************************************************************************
 	// startCameraActivity
 	//******************************************************************************
-	private void startCameraActivity(Camera camera)
+	private void startCameraActivity(NetworkCameraSource networkCameraSource)
 	{
 		Intent intent = new Intent(App.getContext(), PiCameraActivity.class);
-		intent.putExtra(PiCameraActivity.CAMERA, camera);
+		intent.putExtra(PiCameraActivity.CAMERA, networkCameraSource);
 		startActivity(intent);
 	}
 
@@ -411,12 +411,12 @@ public class SelectCameraActivity extends AppCompatActivity
 	//******************************************************************************
 	// startVideoActivity
 	//******************************************************************************
-	private void startVideoActivity(Camera camera)
+	private void startVideoActivity(NetworkCameraSource networkCameraSource)
 	{
 		//Intent intent = new Intent(App.getContext(), VideoActivity.class);
-		//intent.putExtra(VideoActivity.CAMERA, camera);
+		//intent.putExtra(VideoActivity.CAMERA, networkCameraSource);
         Intent intent = new Intent(App.getContext(), ClassifierActivity.class);
-        intent.putExtra(MLCameraActivity.CAMERA, camera);
+        intent.putExtra(MLCameraActivity.CAMERA, networkCameraSource);
 		startActivity(intent);
 	}
 
@@ -425,7 +425,7 @@ public class SelectCameraActivity extends AppCompatActivity
 	//******************************************************************************
 	public void updateCameras()
 	{
-		Collections.sort(Utils.getCameras());
+		Collections.sort(Utils.getNetworkCameraSources());
 		Utils.saveData();
 		adapter.refresh();
 	}

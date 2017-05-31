@@ -17,8 +17,6 @@
 package ca.frozen.rpicameraviewer.mlcameras;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.pm.PackageManager;
 import android.media.Image.Plane;
 import android.media.ImageReader.OnImageAvailableListener;
@@ -33,7 +31,6 @@ import android.view.KeyEvent;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import org.tensorflow.demo.CameraConnectionFragment;
 import org.tensorflow.demo.OverlayView;
 import org.tensorflow.demo.env.Logger;
 
@@ -43,7 +40,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import ca.frozen.rpicameraviewer.activities.PiCamConnectionFragment;
-import ca.frozen.rpicameraviewer.classes.Camera;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
 import ca.frozen.rpicameraviewer.classes.Utils;
 import ca.frozen.rpicameraviewer.R;
 
@@ -56,12 +53,12 @@ public abstract class MLCameraActivity extends AppCompatActivity implements OnIm
   private static final String PERMISSION_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
   // instance variables
-  private Camera camera;
+  private NetworkCameraSource networkCameraSource;
   private FrameLayout frameLayout;
   private PiCamConnectionFragment cameraDisplayFragment;
 
   // public constants
-  public final static String CAMERA = "camera";
+  public final static String CAMERA = "networkCameraSource";
 
   private boolean debug = false;
 
@@ -78,9 +75,9 @@ public abstract class MLCameraActivity extends AppCompatActivity implements OnIm
     // load the settings and cameras
     Utils.loadData();
 
-    // get the camera object
+    // get the networkCameraSource object
     Bundle data = getIntent().getExtras();
-    camera = data.getParcelable(CAMERA);
+    networkCameraSource = data.getParcelable(CAMERA);
 
     // get the frame layout, handle system visibility changes
     frameLayout = (FrameLayout) findViewById(R.id.video);
@@ -190,7 +187,7 @@ public abstract class MLCameraActivity extends AppCompatActivity implements OnIm
   private void requestPermission() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (shouldShowRequestPermissionRationale(PERMISSION_CAMERA) || shouldShowRequestPermissionRationale(PERMISSION_STORAGE)) {
-        Toast.makeText(MLCameraActivity.this, "Camera AND storage permission are required for this demo", Toast.LENGTH_LONG).show();
+        Toast.makeText(MLCameraActivity.this, "NetworkCameraSource AND storage permission are required for this demo", Toast.LENGTH_LONG).show();
       }
       requestPermissions(new String[] {PERMISSION_CAMERA, PERMISSION_STORAGE}, PERMISSIONS_REQUEST);
     }
@@ -198,7 +195,7 @@ public abstract class MLCameraActivity extends AppCompatActivity implements OnIm
 
   public void setFragment() {
     // create the video fragment
-    cameraDisplayFragment = PiCamConnectionFragment.newInstance(getLayoutId(), getDesiredPreviewFrameSize(), camera, true);
+    cameraDisplayFragment = PiCamConnectionFragment.newInstance(getLayoutId(), getDesiredPreviewFrameSize(), networkCameraSource, true);
 
     FragmentTransaction fragTran = getSupportFragmentManager().beginTransaction();
     fragTran.add(R.id.video, cameraDisplayFragment);

@@ -11,20 +11,20 @@ import android.widget.TextView;
 import java.util.List;
 
 import ca.frozen.rpicameraviewer.App;
-import ca.frozen.rpicameraviewer.classes.Camera;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
 import ca.frozen.rpicameraviewer.classes.Utils;
 import ca.frozen.rpicameraviewer.R;
 
 public class PiCameraActivity extends AppCompatActivity
 {
 	// public constants
-	public final static String CAMERA = "camera";
+	public final static String CAMERA = "networkCameraSource";
 
 	// local constants
 	private final static String TAG = "PiCameraActivity";
 
 	// instance variables
-	private Camera camera;
+	private NetworkCameraSource networkCameraSource;
 	private EditText nameEdit;
 	private SourceFragment sourceFragment;
 
@@ -41,21 +41,21 @@ public class PiCameraActivity extends AppCompatActivity
 		// load the settings and cameras
 		Utils.loadData();
 
-		// get the camera object
+		// get the networkCameraSource object
 		Bundle data = getIntent().getExtras();
-		camera = data.getParcelable(CAMERA);
+		networkCameraSource = data.getParcelable(CAMERA);
 
 		// set the name
 		nameEdit = (EditText) findViewById(R.id.camera_name);
-		nameEdit.setText(camera.name);
+		nameEdit.setText(networkCameraSource.name);
 
 		// set the network
 		TextView network = (TextView) findViewById(R.id.camera_network);
-		network.setText(camera.network);
+		network.setText(networkCameraSource.network);
 
 		// set the source fragment
 		sourceFragment = (SourceFragment)getSupportFragmentManager().findFragmentById(R.id.camera_source);
-		sourceFragment.configure(camera.source, true);
+		sourceFragment.configure(networkCameraSource.source, true);
 	}
 
 	//******************************************************************************
@@ -76,18 +76,18 @@ public class PiCameraActivity extends AppCompatActivity
 	{
 		int id = item.getItemId();
 
-		// save the camera
+		// save the networkCameraSource
 		if (id == R.id.action_save)
 		{
-			Camera editedCamera = getAndCheckEditedCamera();
-			if (editedCamera != null)
+			NetworkCameraSource editedNetworkCameraSource = getAndCheckEditedCamera();
+			if (editedNetworkCameraSource != null)
 			{
-				List<Camera> cameras = Utils.getCameras();
-				if (!camera.name.isEmpty())
+				List<NetworkCameraSource> networkCameraSources = Utils.getNetworkCameraSources();
+				if (!networkCameraSource.name.isEmpty())
 				{
-					cameras.remove(camera);
+					networkCameraSources.remove(networkCameraSource);
 				}
-				cameras.add(editedCamera);
+				networkCameraSources.add(editedNetworkCameraSource);
 				Utils.saveData();
 				finish();
 			}
@@ -100,25 +100,25 @@ public class PiCameraActivity extends AppCompatActivity
 	//******************************************************************************
 	// getAndCheckEditedCamera
 	//******************************************************************************
-	private Camera getAndCheckEditedCamera()
+	private NetworkCameraSource getAndCheckEditedCamera()
 	{
 		// create a new network and get the source
-		Camera editedCamera = new Camera(camera);
+		NetworkCameraSource editedNetworkCameraSource = new NetworkCameraSource(networkCameraSource);
 
-		// get and check the camera name
-		editedCamera.name = nameEdit.getText().toString().trim();
-		if (editedCamera.name.isEmpty())
+		// get and check the networkCameraSource name
+		editedNetworkCameraSource.name = nameEdit.getText().toString().trim();
+		if (editedNetworkCameraSource.name.isEmpty())
 		{
 			App.error(this, R.string.error_no_name);
 			return null;
 		}
 
 		// make sure the name doesn't already exist
-		String name = camera.name;
-		if (name.isEmpty() || !name.equals(editedCamera.name))
+		String name = networkCameraSource.name;
+		if (name.isEmpty() || !name.equals(editedNetworkCameraSource.name))
 		{
-			Camera existingCamera = Utils.findCamera(editedCamera.name);
-			if (existingCamera != null)
+			NetworkCameraSource existingNetworkCameraSource = Utils.findCamera(editedNetworkCameraSource.name);
+			if (existingNetworkCameraSource != null)
 			{
 				App.error(this, R.string.error_name_already_exists);
 				return null;
@@ -126,13 +126,13 @@ public class PiCameraActivity extends AppCompatActivity
 		}
 
 		// check the source values
-		editedCamera.source = sourceFragment.getAndCheckEditedSource();
-		if (editedCamera.source == null)
+		editedNetworkCameraSource.source = sourceFragment.getAndCheckEditedSource();
+		if (editedNetworkCameraSource.source == null)
 		{
 			return null;
 		}
 
-		// return the successfully edited camera
-		return editedCamera;
+		// return the successfully edited networkCameraSource
+		return editedNetworkCameraSource;
 	}
 }

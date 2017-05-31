@@ -17,7 +17,6 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -37,7 +36,7 @@ import java.util.Date;
 
 import ca.frozen.rpicameraviewer.App;
 import ca.frozen.rpicameraviewer.R;
-import ca.frozen.rpicameraviewer.classes.Camera;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
 import ca.frozen.rpicameraviewer.classes.HttpReader;
 import ca.frozen.rpicameraviewer.classes.MulticastReader;
 import ca.frozen.rpicameraviewer.classes.RawH264Reader;
@@ -57,7 +56,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
 	}
 
 	// public constants
-	public final static String CAMERA = "camera";
+	public final static String CAMERA = "networkCameraSource";
 	public final static String FULL_SCREEN = "full_screen";
 
 	// local constants
@@ -70,7 +69,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
 	private final static int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
 
 	// instance variables
-	private Camera camera;
+	private NetworkCameraSource networkCameraSource;
 	private boolean fullScreen;
 	private DecoderThread decoder;
 	private ZoomPanTextureView textureView;
@@ -83,12 +82,12 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
 	//******************************************************************************
 	// newInstance
 	//******************************************************************************
-	public static VideoFragment newInstance(Camera camera, boolean fullScreen)
+	public static VideoFragment newInstance(NetworkCameraSource networkCameraSource, boolean fullScreen)
 	{
 		VideoFragment fragment = new VideoFragment();
 
 		Bundle args = new Bundle();
-		args.putParcelable(CAMERA, camera);
+		args.putParcelable(CAMERA, networkCameraSource);
 		args.putBoolean(FULL_SCREEN, fullScreen);
 		fragment.setArguments(args);
 
@@ -108,7 +107,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
 		Utils.loadData();
 
 		// get the parameters
-		camera = getArguments().getParcelable(CAMERA);
+		networkCameraSource = getArguments().getParcelable(CAMERA);
 		fullScreen = getArguments().getBoolean(FULL_SCREEN);
 
 		// create the fade in handler and runnable
@@ -185,7 +184,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
 
 		// configure the name
 		nameView = (TextView)view.findViewById(R.id.video_name);
-		nameView.setText(camera.name);
+		nameView.setText(networkCameraSource.name);
 
 		// initialize the message
 		messageView = (TextView)view.findViewById(R.id.video_message);
@@ -421,7 +420,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
 	{
 		Bitmap image = textureView.getBitmap();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
-		String name = camera.network + "_" + camera.name.replaceAll("\\s+", "") + "_" + sdf.format(new Date()) + ".jpg";
+		String name = networkCameraSource.network + "_" + networkCameraSource.name.replaceAll("\\s+", "") + "_" + sdf.format(new Date()) + ".jpg";
 		Utils.saveImage(getActivity().getContentResolver(), image, name, null);
 		MediaActionSound sound = new MediaActionSound();
 		sound.play(MediaActionSound.SHUTTER_CLICK);
@@ -545,7 +544,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
 			try
 			{
 				// get the multicast lock if necessary
-				if (camera.source.connectionType == Source.ConnectionType.RawMulticast)
+				if (networkCameraSource.source.connectionType == Source.ConnectionType.RawMulticast)
 				{
 					WifiManager wifi = (WifiManager) getActivity().getSystemService(App.getContext().WIFI_SERVICE);
 					if (wifi != null)
@@ -559,7 +558,7 @@ public class VideoFragment extends Fragment implements TextureView.SurfaceTextur
 				decoder = MediaCodec.createDecoderByType("video/avc");
 
 				// create the reader
-				source = camera.getCombinedSource();
+				source = networkCameraSource.getCombinedSource();
 				if (source.connectionType == Source.ConnectionType.RawMulticast)
 				{
 					buffer = new byte[MULTICAST_BUFFER_SIZE];

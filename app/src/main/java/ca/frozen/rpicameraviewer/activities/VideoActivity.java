@@ -7,20 +7,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import ca.frozen.rpicameraviewer.classes.Camera;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
 import ca.frozen.rpicameraviewer.classes.Utils;
 import ca.frozen.rpicameraviewer.R;
 
 public class VideoActivity extends AppCompatActivity implements VideoFragment.OnFadeListener
 {
 	// public constants
-	public final static String CAMERA = "camera";
+	public final static String CAMERA = "networkCameraSource";
 
 	// local constants
 	private final static String TAG = "VideoActivity";
 
 	// instance variables
-	private Camera camera;
+	private NetworkCameraSource networkCameraSource;
 	private FrameLayout frameLayout;
 	private VideoFragment videoFragment;
 
@@ -38,9 +38,9 @@ public class VideoActivity extends AppCompatActivity implements VideoFragment.On
 		// load the settings and cameras
 		Utils.loadData();
 
-		// get the camera object
+		// get the networkCameraSource object
 		Bundle data = getIntent().getExtras();
-		camera = data.getParcelable(CAMERA);
+		networkCameraSource = data.getParcelable(CAMERA);
 
 		// get the frame layout, handle system visibility changes
 		frameLayout = (FrameLayout) findViewById(R.id.video);
@@ -62,7 +62,7 @@ public class VideoActivity extends AppCompatActivity implements VideoFragment.On
 		frameLayout.setSystemUiVisibility(visibility);
 
 		// create the video fragment
-		videoFragment = videoFragment.newInstance(camera, true);
+		videoFragment = videoFragment.newInstance(networkCameraSource, true);
 		FragmentTransaction fragTran = getSupportFragmentManager().beginTransaction();
 		fragTran.add(R.id.video, videoFragment);
 		fragTran.commit();

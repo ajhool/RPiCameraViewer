@@ -3,15 +3,14 @@ package ca.frozen.rpicameraviewer.classes;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Camera implements Comparable, Parcelable
+public class NetworkCameraSource implements Comparable, Parcelable
 {
 	// local constants
-	private final static String TAG = "Camera";
+	private final static String TAG = "NetworkCameraSource";
 
 	// instance variables
 	public String network;
@@ -19,20 +18,19 @@ public class Camera implements Comparable, Parcelable
 	public Source source;
 
 	//******************************************************************************
-	// Camera
+	// NetworkCameraSource
 	//******************************************************************************
-    public Camera(Source.ConnectionType connectionType, String network, String address, int port)
-    {
+    public NetworkCameraSource(Source.ConnectionType connectionType, String network, String address, int port) {
 		this.network = network;
-        this.name = "";
+      this.name = "";
 		this.source = new Source(connectionType, address, port);
 		//Log.d(TAG, "address/source: " + toString());
 	}
 
 	//******************************************************************************
-	// Camera
+	// NetworkCameraSource
 	//******************************************************************************
-	public Camera(String name, Source source)
+	public NetworkCameraSource(String name, Source source)
 	{
 		network = Utils.getNetworkName();
 		this.name = name;
@@ -41,29 +39,29 @@ public class Camera implements Comparable, Parcelable
 	}
 
 	//******************************************************************************
-	// Camera
+	// NetworkCameraSource
 	//******************************************************************************
-	public Camera(Camera camera)
+	public NetworkCameraSource(NetworkCameraSource networkCameraSource)
 	{
-		network = camera.network;
-		name = camera.name;
-		source = new Source(camera.source);
-		//Log.d(TAG, "camera: " + toString());
+		network = networkCameraSource.network;
+		name = networkCameraSource.name;
+		source = new Source(networkCameraSource.source);
+		//Log.d(TAG, "networkCameraSource: " + toString());
 	}
 
 	//******************************************************************************
-	// Camera
+	// NetworkCameraSource
 	//******************************************************************************
-	public Camera(Parcel in)
+	public NetworkCameraSource(Parcel in)
 	{
 		readFromParcel(in);
 		//Log.d(TAG, "parcel: " + toString());
 	}
 
 	//******************************************************************************
-	// Camera
+	// NetworkCameraSource
 	//******************************************************************************
-	public Camera(JSONObject obj)
+	public NetworkCameraSource(JSONObject obj)
 	{
 		try
 		{
@@ -123,13 +121,13 @@ public class Camera implements Comparable, Parcelable
 	//******************************************************************************
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator()
 	{
-		public Camera createFromParcel(Parcel in)
+		public NetworkCameraSource createFromParcel(Parcel in)
 		{
-			return new Camera(in);
+			return new NetworkCameraSource(in);
 		}
-		public Camera[] newArray(int size)
+		public NetworkCameraSource[] newArray(int size)
 		{
-			return new Camera[size];
+			return new NetworkCameraSource[size];
 		}
 	};
 
@@ -149,16 +147,16 @@ public class Camera implements Comparable, Parcelable
     public int compareTo(Object otherCamera)
     {
 		int result = 1;
-		if (otherCamera instanceof Camera)
+		if (otherCamera instanceof NetworkCameraSource)
 		{
-			Camera camera = (Camera) otherCamera;
-			result = name.compareTo(camera.name);
+			NetworkCameraSource networkCameraSource = (NetworkCameraSource) otherCamera;
+			result = name.compareTo(networkCameraSource.name);
 			if (result == 0)
 			{
-				result = source.compareTo(camera.source);
+				result = source.compareTo(networkCameraSource.source);
 				if (result == 0)
 				{
-					result = network.compareTo(camera.network);
+					result = network.compareTo(networkCameraSource.network);
 				}
 			}
 		}

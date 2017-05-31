@@ -2,7 +2,6 @@
 package ca.frozen.rpicameraviewer.classes;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,7 @@ public class CameraAdapter extends BaseAdapter
 	private final static int NUM_VIEWS = 2;
 
 	// instance variables
-	private List<Camera> cameras = new ArrayList<>();
+	private List<NetworkCameraSource> networkCameraSources = new ArrayList<>();
 	private View.OnClickListener scanButtonOnClickListener = null;
 	private boolean showNetwork = false;
 
@@ -44,13 +43,13 @@ public class CameraAdapter extends BaseAdapter
 		boolean showAllCameras = !Utils.connectedToNetwork() || Utils.getSettings().showAllCameras;
 		if (showAllCameras)
 		{
-			cameras = Utils.getCameras();
+			networkCameraSources = Utils.getNetworkCameraSources();
 		}
 		else
 		{
 			String network = Utils.getNetworkName();
 			showAllCameras = network == null || network.isEmpty();
-			cameras = showAllCameras ? Utils.getCameras() : Utils.getNetworkCameras(network);
+			networkCameraSources = showAllCameras ? Utils.getNetworkCameraSources() : Utils.getNetworkCameras(network);
 		}
 		showNetwork = showAllCameras;
 		notifyDataSetChanged();
@@ -60,15 +59,15 @@ public class CameraAdapter extends BaseAdapter
 	// getCount
 	//******************************************************************************
 	@Override
-	public int getCount() { return (cameras.size() > 0) ? cameras.size() : 1; }
+	public int getCount() { return (networkCameraSources.size() > 0) ? networkCameraSources.size() : 1; }
 
 	//******************************************************************************
 	// getItem
 	//******************************************************************************
 	@Override
-	public Camera getItem(int position)
+	public NetworkCameraSource getItem(int position)
 	{
-		return cameras.get(position);
+		return networkCameraSources.get(position);
 	}
 
 	//******************************************************************************
@@ -88,7 +87,7 @@ public class CameraAdapter extends BaseAdapter
 	 ******************************************************/
 	public int getItemViewType(int position)
 	{
-		return (cameras.size() > 0) ? VIEW_CAMERA : VIEW_MESSAGE;
+		return (networkCameraSources.size() > 0) ? VIEW_CAMERA : VIEW_MESSAGE;
 	}
 
 	//******************************************************************************
@@ -110,22 +109,22 @@ public class CameraAdapter extends BaseAdapter
 
 		if (type == VIEW_CAMERA)
 		{
-			// get the camera for this row
-			Camera camera = getItem(position);
+			// get the networkCameraSource for this row
+			NetworkCameraSource networkCameraSource = getItem(position);
 
 			// get the views
 			TextView name = (TextView) convertView.findViewById(R.id.camera_name);
 			TextView address = (TextView) convertView.findViewById(R.id.camera_address);
 
 			// set the views
-			Source source = camera.getCombinedSource();
-			name.setText(camera.name);
+			Source source = networkCameraSource.getCombinedSource();
+			name.setText(networkCameraSource.name);
 			String fullAddress = Utils.getFullAddress(source.address, source.port);
 			if (source.connectionType == Source.ConnectionType.RawHttp)
 			{
 				fullAddress = Utils.getHttpAddress(fullAddress);
 			}
-			address.setText((showNetwork ? (camera.network + ":") : "") + fullAddress);
+			address.setText((showNetwork ? (networkCameraSource.network + ":") : "") + fullAddress);
 		}
 		else
 		{
@@ -140,7 +139,7 @@ public class CameraAdapter extends BaseAdapter
 	}
 
 	//******************************************************************************
-	// getCameras
+	// getNetworkCameraSources
 	//******************************************************************************
-	public List<Camera> getCameras() { return cameras; }
+	public List<NetworkCameraSource> getNetworkCameraSources() { return networkCameraSources; }
 }
