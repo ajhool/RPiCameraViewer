@@ -184,7 +184,7 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
         @Override
         public void onSurfaceTextureAvailable(
             final SurfaceTexture texture, final int width, final int height) {
-          openCamera(width, height);
+          //openCamera(width, height);
         }
 
         @Override
@@ -569,9 +569,9 @@ public class PiCamConnectionFragment extends Fragment implements TextureView.Sur
     // a camera and start preview from here (otherwise, we wait until the surface is ready in
     // the SurfaceTextureListener).
     if (zoomTextureView.isAvailable()) {
-      openCamera(zoomTextureView.getWidth(), zoomTextureView.getHeight());
+      //openCamera(zoomTextureView.getWidth(), zoomTextureView.getHeight());
     } else {
-      zoomTextureView.setSurfaceTextureListener(surfaceTextureListener);
+      zoomTextureView.setSurfaceTextureListener(this);
     }
   }
 
