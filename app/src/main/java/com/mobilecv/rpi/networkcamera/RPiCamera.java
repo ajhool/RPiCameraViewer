@@ -18,7 +18,7 @@
 // Copyright © 2016 Shawn Baker using the MIT License.
 // Copyright © 2017 Aidan Hoolachan using the MIT License.
 
-package ca.frozen.rpicameraviewer.activities;
+package com.mobilecv.rpi.networkcamera;
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,6 +32,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -40,6 +41,7 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+
 import org.tensorflow.demo.env.Logger;
 
 import java.lang.ref.WeakReference;
@@ -48,20 +50,17 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import ca.frozen.rpicameraviewer.App;
+import ca.frozen.rpicameraviewer.R;
+import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
+import ca.frozen.rpicameraviewer.classes.Utils;
+import ca.frozen.rpicameraviewer.views.ZoomPanTextureView;
+
 /*
  * Imports below this line are from app
  */
-import ca.frozen.rpicameraviewer.App;
-import ca.frozen.rpicameraviewer.classes.NetworkCameraSource;
-import ca.frozen.rpicameraviewer.runnables.DecoderThread;
-import ca.frozen.rpicameraviewer.views.ZoomPanTextureView;
 
-import android.support.v4.app.Fragment;
-
-import ca.frozen.rpicameraviewer.R;
-import ca.frozen.rpicameraviewer.classes.Utils;
-
-public class PiCamConnectionFragment extends Fragment {
+public class RPiCamera extends Fragment {
   private static final Logger LOGGER = new Logger();
 
   /**
@@ -173,10 +172,10 @@ public class PiCamConnectionFragment extends Fragment {
    * reference to their outer class.
    */
   private static class FinishDecodeHandler extends Handler {
-    private final WeakReference<PiCamConnectionFragment> mFragment;
+    private final WeakReference<RPiCamera> mFragment;
 
-    public FinishDecodeHandler(PiCamConnectionFragment fragment) {
-      mFragment = new WeakReference<PiCamConnectionFragment>(fragment);
+    public FinishDecodeHandler(RPiCamera fragment) {
+      mFragment = new WeakReference<RPiCamera>(fragment);
     }
   }
 
@@ -187,10 +186,10 @@ public class PiCamConnectionFragment extends Fragment {
    * reference to their outer class.
    */
   private static class StartDecodeHandler extends Handler {
-    private final WeakReference<PiCamConnectionFragment> mFragment;
+    private final WeakReference<RPiCamera> mFragment;
 
-    public StartDecodeHandler(PiCamConnectionFragment fragment) {
-      mFragment = new WeakReference<PiCamConnectionFragment>(fragment);
+    public StartDecodeHandler(RPiCamera fragment) {
+      mFragment = new WeakReference<RPiCamera>(fragment);
     }
   }
 
@@ -226,7 +225,7 @@ public class PiCamConnectionFragment extends Fragment {
   /*
    * Required default constructor used by the Android OS. Use newInstance to instantiate from application.
    */
-  public PiCamConnectionFragment() {
+  public RPiCamera() {
   }
 
   /*
@@ -238,12 +237,12 @@ public class PiCamConnectionFragment extends Fragment {
    *
    * @return The created {@code PiCamConnectionFragment}
    */
-  public static PiCamConnectionFragment newInstance(
+  public static RPiCamera newInstance(
       final int layout,
       final Size inputSize,
       final NetworkCameraSource networkCameraSource,
       final boolean fullScreen) {
-    PiCamConnectionFragment piCamConnectionFragment = new PiCamConnectionFragment();
+    RPiCamera piCamConnectionFragment = new RPiCamera();
 
     Bundle args = new Bundle();
     args.putParcelable(CAMERA, networkCameraSource);
@@ -323,34 +322,6 @@ public class PiCamConnectionFragment extends Fragment {
     fullScreen = getArguments().getBoolean(FULL_SCREEN);
     layout = getArguments().getInt(LAYOUT);
     inputSize = getArguments().getSize(INPUT_SIZE);
-
-
-      // create the finish handler and runnable
-    //finishHandler = new Handler();
-    /*
-    finishRunner = new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        getActivity().finish();
-      }
-    };
-    */
-
-    // create the start video handler and runnable
-    //startVideoHandler = new Handler();
-    /*startVideoRunner = new Runnable() {
-      @Override
-      public void run()
-      {
-        //MediaFormat format = decoder.getMediaFormat();
-        //int videoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
-        //int videoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
-        //zoomTextureView.setVideoSize(videoWidth, videoHeight);
-      }
-    };
-    */
   }
 
   @Override
@@ -483,12 +454,24 @@ public class PiCamConnectionFragment extends Fragment {
     initializeDecoderThread(wifi);
   }
 
+  private DecoderThread.DecoderListener d = new DecoderThread.DecoderListener() {
+    @Override
+    public void onConnectionFailure() {
+      getActivity().finish();
+    }
+
+    @Override
+    public void onConnection() {
+
+    }
+  };
+
   private void initializeDecoderThread(WifiManager wifi){
     decoder = new DecoderThread();
 
     decoder.setWifiManager(wifi);
     decoder.setCamera(networkCameraSource);
-    decoder.setParentFragment(this);
+    decoder.setListener(this);
   }
 
 
@@ -515,12 +498,6 @@ public class PiCamConnectionFragment extends Fragment {
   {
     super.onDestroy();
     //mFinishDecodeHandler.removeCallbacks(finishRunner);
-  }
-
-  public void noConnection(){
-    //finishHandler.postDelayed(finishRunner, FINISH_TIMEOUT);
-    //mFinishDecodeHandler.postDelayed(finishRunner, FINISH_TIMEOUT);
-    getActivity().finish();
   }
 
   /**
